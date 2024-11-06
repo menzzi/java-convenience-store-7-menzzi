@@ -1,5 +1,7 @@
 package store.model.domain;
 
+import java.text.DecimalFormat;
+
 public class Stock {
     private final String name;
     private final int price;
@@ -35,6 +37,7 @@ public class Stock {
 
     @Override
     public String toString() {
-        return "Product{name='" + name + "', price=" + price + ", quantity=" + quantity + ", promotion='" + promotion + "'}";
+        DecimalFormat df = new DecimalFormat("###,###");
+        return "- " + name + " " + df.format(price) + "원 " +  quantity + "개 " + promotion;
     }
 }
