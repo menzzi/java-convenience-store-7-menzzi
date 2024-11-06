@@ -18,7 +18,7 @@ public class StockRepositoryTest {
     }
 
     @Test
-    void testUpdateStockFromFile() throws IOException {
+    void 파일을_읽어와_재고_저장한다() throws IOException {
         stockRepository.updateStockFromFile("src/main/resources/products.md");
 
         List<Stock> stocks = stockRepository.getAllStocks();
