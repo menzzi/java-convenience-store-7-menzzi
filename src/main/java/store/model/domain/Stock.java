@@ -1,12 +1,12 @@
-package store.model;
+package store.model.domain;
 
-public class stock {
+public class Stock {
     private final String name;
     private final int price;
     private int quantity;
     private final String promotion;
 
-    public stock(String name, int price, int quantity, String promotion) {
+    public Stock(String name, int price, int quantity, String promotion) {
         this.name = name;
         this.price = price;
         this.quantity = quantity;
