@@ -19,6 +19,10 @@ public class Receipt {
         return receiptItems.stream().mapToInt(ReceiptItem::getTotalPrice).sum();
     }
 
+    public int getTotalQuantity(){
+        return receiptItems.stream().mapToInt(ReceiptItem::getItemQuantity).sum();
+    }
+
     public int getFinalAmount(){
         return getTotalAmount() - eventDiscount - membershipDiscount;
     }
