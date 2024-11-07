@@ -1,6 +1,7 @@
 package store.view;
 
 public class OutputView {
+    private final String ERROR_FORMAT = "[ERROR]";
     private final String BENEFIT_INSTRUCTIONS_MESSAGE = "멤버십 할인을 받으시겠습니까? (Y/N)";
     private final String PROMOTION_INSTRUCTIONS_MESSAGE = "프로모션 할인이 적용되지 않습니다. 그래도 구매하시겠습니까? (Y/N)";
     private final String MEMBERSHIP_INSTRUCTIONS_MESSAGE = "멤버십 할인을 받으시겠습니까? (Y/N)";
@@ -30,5 +31,9 @@ public class OutputView {
 
     public void printInstructionsAboutAdditionalPurchase(){
         System.out.println(ADDITIONAL_PURCHASE_INSTRUCTIONS_MESSAGE);
+    }
+
+    public void printErrorMessage(String errorMessage){
+        System.out.println(ERROR_FORMAT + errorMessage);
     }
 }
