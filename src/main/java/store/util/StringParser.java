@@ -6,8 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 public class StringParser {
-    private final String VALIDATE_FORMAT_MESSAGE = "입력 형식을 지켜주세요. (예: [사이다-2],[감자칩-1])";
-    private final String VALIDATE_NUMERIC_MESSAGE = "개수는 숫자로 입력해주세요.";
+    private final String VALIDATE_FORMAT_MESSAGE = " 올바르지 않은 형식으로 입력했습니다. 다시 입력해 주세요.";
 
     public Map<String,Integer> validateOrderFormat(String input){
         List<String> inputs = Arrays.stream(input.split(",")).toList();
@@ -44,7 +43,7 @@ public class StringParser {
         try{
             Integer.parseInt(number);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(VALIDATE_NUMERIC_MESSAGE);
+            throw new IllegalArgumentException(VALIDATE_FORMAT_MESSAGE);
         }
     }
 }
