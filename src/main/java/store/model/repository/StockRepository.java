@@ -8,7 +8,7 @@ import java.util.List;
 import store.model.domain.Stock;
 
 public class StockRepository {
-    private final List<Stock> stocks = new ArrayList<>();
+    private static final List<Stock> stocks = new ArrayList<>();
 
     public void updateStockFromFile(String filePath){
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
@@ -21,7 +21,7 @@ public class StockRepository {
         }
     }
 
-    public boolean readFile(String line, boolean isHeader){
+    private boolean readFile(String line, boolean isHeader){
             if (isHeader) {
                 return false;
             }
@@ -32,7 +32,7 @@ public class StockRepository {
             return false;
     }
 
-    public void addStocks(String[] values){
+    private void addStocks(String[] values){
         String name = values[0].trim();
         int price = Integer.parseInt(values[1].trim());
         int quantity = Integer.parseInt(values[2].trim());
@@ -58,7 +58,7 @@ public class StockRepository {
         stocks.add(new Stock(name, price, quantity, promotion));
     }
 
-    public List<Stock> getAllStocks(){
+    public static List<Stock> getAllStocks(){
         return stocks;
     }
 }

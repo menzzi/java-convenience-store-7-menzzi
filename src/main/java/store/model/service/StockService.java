@@ -20,9 +20,9 @@ public class StockService {
         return stockRepository.getAllStocks();
     }
 
-    public static List<Stock> findStockByName(String stockName, int quantity){
+    public static List<Stock> findStockByName(List<Stock> stocks, String stockName, int quantity){
         List<Stock> sameNameStock = new ArrayList<>();
-        for(Stock stock : stockRepository.getAllStocks()){
+        for(Stock stock : stocks){
             if(stock.getName().equals(stockName)){
                 sameNameStock.add(stock);
             }
