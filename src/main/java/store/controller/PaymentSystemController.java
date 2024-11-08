@@ -21,12 +21,11 @@ public class PaymentSystemController {
     }
 
     public void run(){
-
+        stocks = StockService.readStocks("src/main/resources/products.md");
     }
 
     private void order(){
        output. printWelcomeGreeting();
-       stocks = StockService.readStocks("src/main/resources/products.md");
        printStocks(stocks);
        Map<String,Integer> orders = inputOrder();
        processOrder(orders);
@@ -63,11 +62,6 @@ public class PaymentSystemController {
         for(Stock stock : sameNameStock){
             if(!stock.getPromotion().equals("null")){
                 PromotionResult promotionResult = PromotionService.applyPromotion(stock.getPromotion(),stock.getQuantity(),quantity);
-                // 함수(총 개수, 프로모션 내용)
-                // 일단 프로모션 먼저 적용하기
-                // 1. 프로모션 상품 개수 > 구매 개수 -> 딱 떨어지는지 아니면 더 가져와.
-                // 2. 프로모션 상품 개수 = 구매 개수 -> 딱 떨어지면 끝 아니면 적용못함,,ㄱㅊ? 물어보기
-                // 3. 프로모션 상품개수 < 구매개수 -> 적용가능한 만큼만 ㄱㄱ
 
             }
             if(remainQuantity > stock.getQuantity()){
