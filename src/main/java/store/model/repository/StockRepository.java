@@ -38,6 +38,23 @@ public class StockRepository {
         int quantity = Integer.parseInt(values[2].trim());
         String promotion = values[3].trim();
 
+        if(!promotion.equals("null")){
+            addPromotionProduct(name,price,quantity,promotion);
+            return;
+        }
+        addGeneralProduct(name, price, quantity, promotion);
+    }
+
+    public void addPromotionProduct(String name, int price, int quantity, String promotion){
+        stocks.add(new Stock(name, price, quantity, promotion));
+        stocks.add(new Stock(name, price, 0, "null"));
+    }
+
+    public void addGeneralProduct(String name, int price, int quantity, String promotion){
+        Stock candidateSameName = stocks.getLast();
+        if(candidateSameName.getName().equals(name) && candidateSameName.getPromotion().equals("null")){
+            stocks.remove(candidateSameName);
+        }
         stocks.add(new Stock(name, price, quantity, promotion));
     }
 
