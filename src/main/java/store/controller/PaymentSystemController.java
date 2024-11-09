@@ -139,7 +139,7 @@ public class PaymentSystemController {
         if(promotionResult.getMessage().equals("포기")){
             return givingUpPromotionProduct(promotionResult,receiptItems,freeGift,stock);
         }
-       return purchaseByApplyingPromotion(receiptItems,freeGift,stock,promotionResult.getCurrentQuantity());
+        return purchaseByApplyingPromotion(receiptItems,freeGift,stock,promotionResult.getCurrentQuantity());
     }
 
     private int purchaseByApplyingPromotion(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGift, Stock stock, int quantity){

@@ -61,6 +61,20 @@ public class PromotionServiceTest {
     }
 
     @Test
+    public void 투플러스원_프로모션_적용3() {
+        List<Promotion> promotions = Arrays.asList(
+                new Promotion("2+1", 2,1,"2024-11-01", "2024-12-31"),
+                new Promotion("반짝할인", 1,1,"2024-11-01", "2024-11-30")
+        );
+
+        PromotionResult result = promotionService.applyPromotion(promotions, "2+1", 5, 7);
+
+        assertEquals("포기", result.getMessage());
+        assertEquals(3,result.getCurrentQuantity());
+        assertEquals(4,result.getRelateQuantity());
+    }
+
+    @Test
     public void 원플러스원_프로모션_적용() {
         List<Promotion> promotions = Arrays.asList(
                 new Promotion("2+1", 2,1,"2024-11-01", "2024-12-31"),
