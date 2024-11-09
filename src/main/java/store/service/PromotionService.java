@@ -1,4 +1,4 @@
-package store.model.service;
+package store.service;
 
 import camp.nextstep.edu.missionutils.DateTimes;
 import java.time.LocalDate;
