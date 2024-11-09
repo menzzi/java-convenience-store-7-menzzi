@@ -22,7 +22,7 @@ public class StockRepositoryTest {
         stockRepository.updateStockFromFile("src/main/resources/products.md");
 
         List<Stock> stocks = stockRepository.getAllStocks();
-        assertEquals(16, stocks.size());
+        assertEquals(18, stocks.size());
         assertEquals("콜라", stocks.getFirst().getName());
         assertEquals(1000, stocks.getFirst().getPrice());
         assertEquals(10, stocks.getFirst().getQuantity());
