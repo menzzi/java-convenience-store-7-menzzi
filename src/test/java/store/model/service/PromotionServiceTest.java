@@ -59,4 +59,18 @@ public class PromotionServiceTest {
         assertEquals(4,result.getCurrentQuantity());
         assertEquals(1,result.getRelateQuantity());
     }
+
+    @Test
+    public void 원플러스원_프로모션_적용() {
+        List<Promotion> promotions = Arrays.asList(
+                new Promotion("2+1", 2,1,"2024-11-01", "2024-12-31"),
+                new Promotion("반짝할인", 1,1,"2024-11-01", "2024-11-30")
+        );
+
+        PromotionResult result = promotionService.applyPromotion(promotions, "반짝할인", 5, 3);
+
+        assertEquals("추가", result.getMessage());
+        assertEquals(3,result.getCurrentQuantity());
+        assertEquals(1,result.getRelateQuantity());
+    }
 }
