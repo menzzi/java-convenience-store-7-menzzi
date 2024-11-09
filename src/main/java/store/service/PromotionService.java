@@ -37,11 +37,11 @@ public class PromotionService {
         return null;
     }
 
-    public PromotionResult applyPromotion(List<Promotion> promotions,String promotionName, int stockQuantity, int quantity){
+    public PromotionResult applyPromotion(List<Promotion> promotions, String promotionName, int stockQuantity, int quantity){
         Promotion promotion = findPromotionByName(promotions,promotionName);
         if(findPromotionStatus(promotion.getStart_date(),promotion.getEnd_date())){
 
-            if(promotion.getGet()==2 && promotion.getBuy()==1){
+            if(promotion.getBuy()==2 && promotion.getGet()==1){
                 return calculateAvailableQuantityTwoPlusOne(stockQuantity,quantity);
             }
             return calculateAvailableQuantityOnePlusOne(stockQuantity,quantity);
