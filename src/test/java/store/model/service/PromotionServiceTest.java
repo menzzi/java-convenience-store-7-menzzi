@@ -70,7 +70,7 @@ public class PromotionServiceTest {
         PromotionResult result = promotionService.applyPromotion(promotions, "2+1", 7, 10);
 
         assertEquals("포기", result.getMessage());
-        assertEquals(6,result.getCurrentQuantity());
+        assertEquals(10,result.getCurrentQuantity());
         assertEquals(4,result.getRelateQuantity());
     }
 

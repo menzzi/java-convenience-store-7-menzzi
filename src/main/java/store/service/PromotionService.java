@@ -16,7 +16,7 @@ public class PromotionService {
         this.promotionRepository = promotionRepository;
     }
 
-    public List<Promotion> readStocks(String filePath){
+    public List<Promotion> readPromotions(String filePath){
         promotionRepository.updatePromotionFromFile(filePath);
         return promotionRepository.getAllPromotions();
     }

@@ -32,6 +32,11 @@ public class PaymentSystemController {
         this.output = output;
     }
 
+    public void clearStock(){
+        stocks.clear();
+        promotions.clear();
+    }
+
     public void run(){
         StockRepository stockRepository = new StockRepository();
         stockService = new StockService(stockRepository);
@@ -39,9 +44,10 @@ public class PaymentSystemController {
 
         PromotionRepository promotionRepository = new PromotionRepository();
         promotionService = new PromotionService(promotionRepository);
-        promotions = promotionService.readStocks("src/main/resources/promotions.md");
+        promotions = promotionService.readPromotions("src/main/resources/promotions.md");
 
         order();
+        clearStock();
     }
 
     private void order(){
@@ -65,9 +71,11 @@ public class PaymentSystemController {
             inputAndProceedOrder();
         }
         output.printInstructionsAboutAdditionalPurchase();
-        if (inputYesOrNo().equals("Y")) {
-            order();
+        if (!inputYesOrNo().equals("Y")) {
+            clearStock();
+            return;
         }
+        order();
     }
 
     private String inputYesOrNo(){
@@ -113,7 +121,7 @@ public class PaymentSystemController {
                     continue;
                 }
                 stock.decreaseQuantity(ActualNumberOfPurchases);
-                remainQuantity = 0;
+                remainQuantity -= ActualNumberOfPurchases;
             }
             if(isRemain){
                 remainQuantity -= purchaseGeneralProduct(receiptItems,stock,quantity);
