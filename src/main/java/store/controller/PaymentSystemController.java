@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import store.model.domain.MembershipDiscount;
+import store.model.domain.Promotion;
 import store.model.domain.PromotionResult;
 import store.model.domain.Receipt;
 import store.model.domain.ReceiptItem;
 import store.model.domain.Stock;
+import store.model.repository.PromotionRepository;
+import store.model.repository.StockRepository;
 import store.service.PromotionService;
 import store.service.StockService;
 import store.util.StringParser;
@@ -18,9 +21,11 @@ public class PaymentSystemController {
     private final InputView input;
     private final OutputView output;
     private List<Stock> stocks;
+    private List<Promotion> promotions;
+    private StockService stockService;
+    private PromotionService promotionService;
 
     private static final String INVALIDATE_AVAILABLE_STOCK_MESSAGE = " 재고 수량을 초과하여 구매할 수 없습니다. 다시 입력해 주세요.";
-
 
     public PaymentSystemController(InputView input, OutputView output) {
         this.input = input;
@@ -28,7 +33,13 @@ public class PaymentSystemController {
     }
 
     public void run(){
-        stocks = StockService.readStocks("src/main/resources/products.md");
+        StockRepository stockRepository = new StockRepository();
+        stockService = new StockService(stockRepository);
+        stocks = stockService.readStocks("src/main/resources/products.md");
+
+        PromotionRepository promotionRepository = new PromotionRepository();
+        promotionService = new PromotionService(promotionRepository);
+        promotions = promotionService.readStocks("src/main/resources/promotions.md");
 
         order();
     }
@@ -39,6 +50,12 @@ public class PaymentSystemController {
        inputAndProceedOrder();
     }
 
+    private void printStocks(List<Stock> stocks){
+        for(Stock stock : stocks){
+            output.printStockInformation(stock.toString());
+        }
+    }
+
     private void inputAndProceedOrder(){
         try{
             processOrder(StringParser.validateOrderFormat(input.inputOrder()));
@@ -47,8 +64,7 @@ public class PaymentSystemController {
             inputAndProceedOrder();
         }
         output.printInstructionsAboutAdditionalPurchase();
-        String continueOrder = inputYesOrNo();
-        if (continueOrder.equals("Y")) {
+        if (inputYesOrNo().equals("Y")) {
             order();
         }
     }
@@ -68,17 +84,11 @@ public class PaymentSystemController {
 
         for (String stockName : orders.keySet()) {
             int quantity = orders.get(stockName);
-            List<Stock> sameNameStock = StockService.findStockByName(stocks,stockName,quantity);
+            List<Stock> sameNameStock = stockService.findStockByName(stocks,stockName,quantity);
             applyPromotionPriority(receiptItems,freeGift,sameNameStock,quantity);
         }
         String membershipStatus = askMembership(receiptItems,freeGift);
         printReceipt(receiptItems,freeGift,membershipStatus);
-    }
-
-    public void printStocks(List<Stock> stocks){
-        for(Stock stock : stocks){
-            output.printStockInformation(stock.toString());
-        }
     }
 
     public void applyPromotionPriority(List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,List<Stock> sameNameStock, int quantity){
@@ -90,7 +100,7 @@ public class PaymentSystemController {
         boolean isRemain = false;
         for(Stock stock : sameNameStock){
             if(!stock.getPromotion().equals("null")){
-                PromotionResult promotionResult = PromotionService.applyPromotion(stock.getPromotion(),stock.getQuantity(),quantity);
+                PromotionResult promotionResult = promotionService.applyPromotion(promotions,stock.getPromotion(),stock.getQuantity(),quantity);
                 if(promotionResult.getMessage().equals("만료")) {
                     isRemain = true;
                     continue;
@@ -98,7 +108,7 @@ public class PaymentSystemController {
                 int ActualNumberOfPurchases = applyPromotionResult(promotionResult, receiptItems, freeGift, stock, quantity);
                 if(ActualNumberOfPurchases > stock.getQuantity()){
                     stock.decreaseQuantity(stock.getQuantity());
-                    remainQuantity = applyPromotionResult(promotionResult, receiptItems, freeGift, stock, quantity) - stock.getQuantity();
+                    remainQuantity = ActualNumberOfPurchases - stock.getQuantity();
                     continue;
                 }
                 stock.decreaseQuantity(ActualNumberOfPurchases);
@@ -160,7 +170,7 @@ public class PaymentSystemController {
     }
 
     private void addFreeGift(List<ReceiptItem> freeGift, Stock stock, int quantity){
-        if(stock.getPromotion().contains("2+1")){ // 시간 되면 수정
+        if(stock.getPromotion().matches(".*2\\+1.*")){ // 시간 되면 수정
             int freeQuantity = quantity / 3;
             if(freeQuantity > 0){
                 freeGift.add(new ReceiptItem(stock.getName(),freeQuantity,stock.getPrice()));
@@ -200,6 +210,7 @@ public class PaymentSystemController {
 
     private void calculate(List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,String membershipStatus,Receipt receipt){
         int totalPromotionAmount = 0;
+
         if(!freeGift.isEmpty()){
             output.printPromotionInfomation(freeGift);
             totalPromotionAmount = receipt.getTotalPromotionAmount();

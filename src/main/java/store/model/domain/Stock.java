@@ -61,7 +61,7 @@ public class Stock {
     }
 
     private String outOfStockString(StringBuilder sb){
-        sb.append("재고없음 ");
+        sb.append("재고 없음 ");
         if(promotion.equals("null")) {
             return sb.toString();
         }
