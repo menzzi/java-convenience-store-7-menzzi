@@ -16,7 +16,10 @@ public class StockService {
     }
 
     public List<Stock> readStocks(String filePath){
-        stockRepository.updateStockFromFile(filePath);
+        if (stockRepository.getAllStocks().isEmpty()) {
+            stockRepository.updateStockFromFile(filePath);
+        }
+
         return stockRepository.getAllStocks();
     }
 
