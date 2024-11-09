@@ -54,6 +54,7 @@ public class PaymentSystemController {
         for(Stock stock : stocks){
             output.printStockInformation(stock.toString());
         }
+        System.out.println();
     }
 
     private void inputAndProceedOrder(){

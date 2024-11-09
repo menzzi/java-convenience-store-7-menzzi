@@ -6,7 +6,6 @@ import store.model.domain.ReceiptItem;
 
 public class OutputView {
     private final String ERROR_FORMAT = "[ERROR]";
-    private final String BENEFIT_INSTRUCTIONS_MESSAGE = "멤버십 할인을 받으시겠습니까? (Y/N)";
     private final String UNAVAILBLE_PROMOTION_INSTRUCTIONS_MESSAGE = "프로모션 할인이 적용되지 않습니다. 그래도 구매하시겠습니까? (Y/N)";
     private final String ADD_PRODUCT_INSTRUCTIONS_MESSAGE = "무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)";
     private final String MEMBERSHIP_INSTRUCTIONS_MESSAGE = "멤버십 할인을 받으시겠습니까? (Y/N)";
@@ -22,28 +21,29 @@ public class OutputView {
         System.out.println(stockDetails);
     }
 
-    public void printInstructionsAboutBenefit(){
-        System.out.println(BENEFIT_INSTRUCTIONS_MESSAGE);
-    }
-
     public void printInstructionsAboutUnavailablePromotion(String productName, int quantity){
         System.out.printf("현재 %s %d개는 %s",productName,quantity,UNAVAILBLE_PROMOTION_INSTRUCTIONS_MESSAGE);
+        System.out.println();
     }
 
     public void printInstructionsAboutAddProduct(String productName, int quantity){
         System.out.printf("현재 %s은(는) %d개를 %s",productName,quantity,ADD_PRODUCT_INSTRUCTIONS_MESSAGE);
+        System.out.println();
     }
 
     public void printInstructionsAboutMembership(){
         System.out.println(MEMBERSHIP_INSTRUCTIONS_MESSAGE);
+        System.out.println();
     }
 
     public void printInstructionsAboutAdditionalPurchase(){
         System.out.println(ADDITIONAL_PURCHASE_INSTRUCTIONS_MESSAGE);
+        System.out.println();
     }
 
     public void printErrorMessage(String errorMessage){
         System.out.println(ERROR_FORMAT + errorMessage);
+        System.out.println();
     }
 
     public void printPurchaseInformation(List<ReceiptItem> receiptItems){
@@ -69,5 +69,6 @@ public class OutputView {
         System.out.printf("행사할인\t\t\t-%s%n", df.format(totalPromotionAmount));
         System.out.printf("멤버십할인\t\t\t-%s%n", df.format(membershipAmount));
         System.out.printf("내실돈\t\t\t%s%n", df.format(totalMoneyToBePaid));
+        System.out.println();
     }
 }
