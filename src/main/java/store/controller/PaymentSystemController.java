@@ -105,32 +105,35 @@ public class PaymentSystemController {
             purchaseGeneralProduct(receiptItems,sameNameStock.getFirst(),quantity);
             return;
         }
-        int remainQuantity = quantity;
-        boolean isRemain = false;
-        for(Stock stock : sameNameStock){
-            if(!stock.getPromotion().equals("null")){
-                PromotionResult promotionResult = promotionService.applyPromotion(promotions,stock.getPromotion(),stock.getQuantity(),quantity);
-                if(promotionResult.getMessage().equals("만료")) {
-                    isRemain = true;
-                    continue;
-                }
-                int ActualNumberOfPurchases = applyPromotionResult(promotionResult, receiptItems, freeGift, stock, quantity);
-                if(ActualNumberOfPurchases > stock.getQuantity()){
-                    stock.decreaseQuantity(stock.getQuantity());
-                    remainQuantity = ActualNumberOfPurchases - stock.getQuantity();
-                    continue;
-                }
-                stock.decreaseQuantity(ActualNumberOfPurchases);
-                remainQuantity -= ActualNumberOfPurchases;
+        Stock promotionStock = sameNameStock.getFirst();
+        int remainQuantity  = applyPromotionStock(receiptItems,freeGift,promotionStock,quantity);
+
+        Stock generalStock = sameNameStock.get(1);
+
+        if(remainQuantity != 0){
+            if(remainQuantity == quantity){
+                purchaseGeneralProduct(receiptItems,generalStock,remainQuantity);
+                return;
             }
-            if(isRemain){
-                remainQuantity -= purchaseGeneralProduct(receiptItems,stock,quantity);
-                isRemain = false;
-            }
-            if(remainQuantity != 0){
-                stock.decreaseQuantity(remainQuantity);
-            }
+            generalStock.decreaseQuantity(remainQuantity);
         }
+    }
+
+    public int applyPromotionStock(List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,Stock promotionStock, int quantity){
+        int remainQuantity = quantity;
+        PromotionResult promotionResult = promotionService.applyPromotion(promotions,promotionStock.getPromotion(),promotionStock.getQuantity(),quantity);
+        if(promotionResult.getMessage().equals("만료")) {
+            return remainQuantity;
+        }
+        int actualNumberOfPurchases = applyPromotionResult(promotionResult, receiptItems, freeGift, promotionStock, quantity);
+        if(actualNumberOfPurchases > promotionStock.getQuantity()){
+            remainQuantity = actualNumberOfPurchases - promotionStock.getQuantity();
+            promotionStock.decreaseQuantity(promotionStock.getQuantity());
+            return remainQuantity;
+        }
+        promotionStock.decreaseQuantity(actualNumberOfPurchases);
+        remainQuantity -= actualNumberOfPurchases;
+        return remainQuantity;
     }
 
     public int purchaseGeneralProduct(List<ReceiptItem> receiptItems, Stock stock,int quantity){
