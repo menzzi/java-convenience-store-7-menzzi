@@ -29,21 +29,36 @@ public class PaymentSystemController {
 
     public void run(){
         stocks = StockService.readStocks("src/main/resources/products.md");
+
+        order();
     }
 
     private void order(){
        output. printWelcomeGreeting();
        printStocks(stocks);
-       Map<String,Integer> orders = inputOrder();
-       processOrder(orders);
+       inputAndProceedOrder();
     }
 
-    private Map<String,Integer> inputOrder(){
+    private void inputAndProceedOrder(){
         try{
-            return StringParser.validateOrderFormat(input.inputOrder());
+            processOrder(StringParser.validateOrderFormat(input.inputOrder()));
         }catch (IllegalArgumentException e){
             output.printErrorMessage(e.getMessage());
-            return inputOrder();
+            inputAndProceedOrder();
+        }
+        output.printInstructionsAboutAdditionalPurchase();
+        String continueOrder = inputYesOrNo();
+        if (continueOrder.equals("Y")) {
+            order();
+        }
+    }
+
+    private String inputYesOrNo(){
+        try{
+            return input.inputYesOrNo();
+        }catch (IllegalArgumentException e){
+            output.printErrorMessage(e.getMessage());
+            return inputYesOrNo();
         }
     }
 
@@ -124,7 +139,7 @@ public class PaymentSystemController {
 
     private int addPromotionProduct(PromotionResult promotionResult, List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,Stock stock){
         output.printInstructionsAboutAddProduct(stock.getName(), promotionResult.getRelateQuantity());
-        String userInput = input.inputYesOrNo();
+        String userInput = inputYesOrNo();
         if(userInput.equals("Y")){
             purchaseByApplyingPromotion(receiptItems,freeGift,stock,promotionResult.getTotalAddQuantity());
             return promotionResult.getTotalAddQuantity();
@@ -135,7 +150,7 @@ public class PaymentSystemController {
 
     private int givingUpPromotionProduct(PromotionResult promotionResult, List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,Stock stock){
         output.printInstructionsAboutUnavailablePromotion(stock.getName(), promotionResult.getRelateQuantity());
-        String userInput = input.inputYesOrNo();
+        String userInput = inputYesOrNo();
         if(userInput.equals("Y")){
             purchaseByApplyingPromotion(receiptItems,freeGift,stock,promotionResult.getCurrentQuantity());
             return promotionResult.getCurrentQuantity();
@@ -160,7 +175,7 @@ public class PaymentSystemController {
     private String askMembership(List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift){
         if(receiptItems.size() > freeGift.size()){
             output.printInstructionsAboutMembership();
-            return input.inputYesOrNo();
+            return inputYesOrNo();
         }
         return "N";
     }
