@@ -46,16 +46,16 @@ public class OutputView {
         DecimalFormat df = new DecimalFormat("###,###");
 
         System.out.println("===========W 편의점=============");
-        System.out.printf("%-10s%5s%8s\n", "상품명", "수량", "금액");
+        System.out.printf("%-12s\t%-5s\t%-10s\n", "상품명", "수량", "금액");
         for (ReceiptItem item : receiptItems) {
-            System.out.printf("%-10s%5d%12s\n", item.getItemName(), item.getItemQuantity(), df.format(item.getTotalPrice()));
+            System.out.printf("%-12s\t%-5d\t%-10s\n", item.getItemName(), item.getItemQuantity(), df.format(item.getTotalPrice()));
         }
     }
 
     public void printPromotionInfomation(List<ReceiptItem> freeGift){
         System.out.println("===========증\t정=============");
         for (ReceiptItem item : freeGift) {
-            System.out.printf("%-12s%5d\n", item.getItemName(), item.getItemQuantity());
+            System.out.printf("%-12s\t%-5d\n", item.getItemName(), item.getItemQuantity());
         }
     }
 
@@ -63,10 +63,10 @@ public class OutputView {
         DecimalFormat df = new DecimalFormat("###,###");
 
         System.out.println("==============================");
-        System.out.printf("%-10s%5d%12s\n", "총구매액", totalCount, df.format(totalAmount));
-        System.out.printf("%-10s%-5s%12s\n", "행사할인", "", "-" + df.format(totalPromotionAmount));
-        System.out.printf("%-10s%-5s%12s\n", "멤버십할인", "", "-" + df.format(membershipAmount));
-        System.out.printf("%-10s%-5s%12s\n", "내실돈", "", df.format(totalMoneyToBePaid));
+        System.out.printf("%-12s\t%-5d\t%-10s\n", "총구매액", totalCount, df.format(totalAmount));
+        System.out.printf("%-20s\t%-10s\n", "행사할인", "-" + df.format(totalPromotionAmount));
+        System.out.printf("%-20s\t%-10s\n", "멤버십할인", "-" + df.format(membershipAmount));
+        System.out.printf("%-20s\t%-10s\n", "내실돈", df.format(totalMoneyToBePaid));
         System.out.println();
     }
 }
