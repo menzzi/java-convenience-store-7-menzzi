@@ -53,7 +53,6 @@ public class PaymentSystemController {
             int quantity = orders.get(stockName);
             List<Stock> sameNameStock = StockService.findStockByName(stocks,stockName,quantity);
             applyPromotionPriority(receiptItems,freeGift,sameNameStock,quantity);
-            // 프로모션이랑 List<Stock> 가지고 프로모션 서비스(프로모션 우선 적용 구현)랑 상호작용해서 최종 수량 가져오면
             // 재고서비스에서 수량 업데이트하는 메서드 구현
         }
     }
@@ -65,64 +64,81 @@ public class PaymentSystemController {
     }
 
     public void applyPromotionPriority(List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,List<Stock> sameNameStock, int quantity){
-        int remainQuantity = quantity;
         if(sameNameStock.size()==1){
             purchaseGeneralProduct(receiptItems,sameNameStock.getFirst(),quantity);
             return;
         }
+        int remainQuantity = quantity;
+        boolean isRemain = false;
         for(Stock stock : sameNameStock){
             if(!stock.getPromotion().equals("null")){
                 PromotionResult promotionResult = PromotionService.applyPromotion(stock.getPromotion(),stock.getQuantity(),quantity);
-                applyPromotionResult(promotionResult,receiptItems,freeGift,stock,quantity);
+                if(promotionResult.getMessage().equals("만료")) {
+                    isRemain = true;
+                    continue;
+                }
+                int ActualNumberOfPurchases = applyPromotionResult(promotionResult, receiptItems, freeGift, stock, quantity);
+                if(ActualNumberOfPurchases > stock.getQuantity()){
+                    stock.decreaseQuantity(stock.getQuantity());
+                    remainQuantity = applyPromotionResult(promotionResult, receiptItems, freeGift, stock, quantity) - stock.getQuantity();
+                    continue;
+                }
+                stock.decreaseQuantity(ActualNumberOfPurchases);
             }
-            purchaseGeneralProduct(receiptItems,stock,remainQuantity); //remainQuantity 만큼 일반 상품 구매
-            // 재고 업데이트
+            if(isRemain){
+                purchaseGeneralProduct(receiptItems,stock,quantity);
+            }
+            if(remainQuantity != 0){
+                stock.decreaseQuantity(remainQuantity);
+            }
         }
     }
 
-    public void purchaseGeneralProduct(List<ReceiptItem> receiptItems, Stock stock,int quantity){
+    public int purchaseGeneralProduct(List<ReceiptItem> receiptItems, Stock stock,int quantity){
         if(quantity > stock.getQuantity()){
             throw new IllegalArgumentException(INVALIDATE_AVAILABLE_STOCK_MESSAGE);
         }
         receiptItems.add(new ReceiptItem(stock.getName(),stock.getPrice(),quantity));
-        // 재고 업데이트
+        stock.decreaseQuantity(quantity);
+        return quantity;
     }
 
-    public void applyPromotionResult(PromotionResult promotionResult, List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,Stock stock, int quantity){
-        if(promotionResult.getMessage().equals("만료")){
-            purchaseGeneralProduct(receiptItems,stock,quantity);
-        }
+    public int applyPromotionResult(PromotionResult promotionResult, List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,Stock stock, int quantity){
         if(promotionResult.getMessage().equals("추가")){
             addPromotionProduct(promotionResult,receiptItems,freeGift,stock);
         }
         if(promotionResult.getMessage().equals("포기")){
-            givingUpPromotionProduct(promotionResult,receiptItems,freeGift,stock);
+            return givingUpPromotionProduct(promotionResult,receiptItems,freeGift,stock);
         }
-        purchaseByApplyingPromotion(receiptItems,freeGift,stock,promotionResult.getCurrentQuantity());
+       return purchaseByApplyingPromotion(receiptItems,freeGift,stock,promotionResult.getCurrentQuantity());
     }
 
-    private void purchaseByApplyingPromotion(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGift, Stock stock, int quantity){
+    private int purchaseByApplyingPromotion(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGift, Stock stock, int quantity){
         receiptItems.add(new ReceiptItem(stock.getName(),quantity,stock.getPrice()));
-        //재고 업데이트 (프로모션 상품 업데이트)
         addFreeGift(freeGift,stock,quantity);
+        return quantity;
     }
 
-    private void addPromotionProduct(PromotionResult promotionResult, List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,Stock stock){
+    private int addPromotionProduct(PromotionResult promotionResult, List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,Stock stock){
         output.printInstructionsAboutAddProduct(stock.getName(), promotionResult.getRelateQuantity());
         String userInput = input.inputYesOrNo();
         if(userInput.equals("Y")){
             purchaseByApplyingPromotion(receiptItems,freeGift,stock,promotionResult.getTotalAddQuantity());
+            return promotionResult.getTotalAddQuantity();
         }
         purchaseByApplyingPromotion(receiptItems,freeGift,stock,promotionResult.getCurrentQuantity());
+        return promotionResult.getCurrentQuantity();
     }
 
-    private void givingUpPromotionProduct(PromotionResult promotionResult, List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,Stock stock){
+    private int givingUpPromotionProduct(PromotionResult promotionResult, List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,Stock stock){
         output.printInstructionsAboutUnavailablePromotion(stock.getName(), promotionResult.getRelateQuantity());
         String userInput = input.inputYesOrNo();
         if(userInput.equals("Y")){
             purchaseByApplyingPromotion(receiptItems,freeGift,stock,promotionResult.getCurrentQuantity());
+            return promotionResult.getCurrentQuantity();
         }
         purchaseByApplyingPromotion(receiptItems,freeGift,stock,promotionResult.getTotalMinusQuantity());
+        return promotionResult.getTotalMinusQuantity();
     }
 
     private void addFreeGift(List<ReceiptItem> freeGift, Stock stock, int quantity){
