@@ -127,7 +127,7 @@ public class PaymentSystemController {
         if(quantity > stock.getQuantity()){
             throw new IllegalArgumentException(INVALIDATE_AVAILABLE_STOCK_MESSAGE);
         }
-        receiptItems.add(new ReceiptItem(stock.getName(),stock.getPrice(),quantity));
+        receiptItems.add(new ReceiptItem(stock.getName(),quantity,stock.getPrice()));
         stock.decreaseQuantity(quantity);
         return quantity;
     }

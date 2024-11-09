@@ -23,22 +23,18 @@ public class OutputView {
 
     public void printInstructionsAboutUnavailablePromotion(String productName, int quantity){
         System.out.printf("현재 %s %d개는 %s",productName,quantity,UNAVAILBLE_PROMOTION_INSTRUCTIONS_MESSAGE);
-        System.out.println();
     }
 
     public void printInstructionsAboutAddProduct(String productName, int quantity){
         System.out.printf("현재 %s은(는) %d개를 %s",productName,quantity,ADD_PRODUCT_INSTRUCTIONS_MESSAGE);
-        System.out.println();
     }
 
     public void printInstructionsAboutMembership(){
         System.out.println(MEMBERSHIP_INSTRUCTIONS_MESSAGE);
-        System.out.println();
     }
 
     public void printInstructionsAboutAdditionalPurchase(){
         System.out.println(ADDITIONAL_PURCHASE_INSTRUCTIONS_MESSAGE);
-        System.out.println();
     }
 
     public void printErrorMessage(String errorMessage){
