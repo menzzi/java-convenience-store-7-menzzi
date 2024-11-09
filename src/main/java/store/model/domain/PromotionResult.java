@@ -23,11 +23,11 @@ public class PromotionResult {
         return relateQuantity;
     }
 
-    public int getTotalAddQuantity(){
-        return currentQuantity+relateQuantity;
+    public int getTotalAddQuantity() {
+        return currentQuantity + relateQuantity;
     }
 
-    public int getTotalMinusQuantity(){
-        return currentQuantity-relateQuantity;
+    public int getTotalMinusQuantity() {
+        return currentQuantity - relateQuantity;
     }
 }

@@ -10,7 +10,7 @@ import store.model.domain.Promotion;
 public class PromotionRepository {
     private final List<Promotion> Promotions = new ArrayList<>();
 
-    public void updatePromotionFromFile(String filePath){
+    public void updatePromotionFromFile(String filePath) {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             boolean isHeader = true;
@@ -21,7 +21,7 @@ public class PromotionRepository {
         }
     }
 
-    public boolean readFile(String line, boolean isHeader){
+    public boolean readFile(String line, boolean isHeader) {
         if (isHeader) {
             return false;
         }
@@ -32,7 +32,7 @@ public class PromotionRepository {
         return false;
     }
 
-    public void addPromotions(String[] values){
+    public void addPromotions(String[] values) {
         String name = values[0].trim();
         int buy = Integer.parseInt(values[1].trim());
         int get = Integer.parseInt(values[2].trim());
@@ -42,7 +42,7 @@ public class PromotionRepository {
         Promotions.add(new Promotion(name, buy, get, start_date, end_date));
     }
 
-    public List<Promotion> getAllPromotions(){
+    public List<Promotion> getAllPromotions() {
         return Promotions;
     }
 }

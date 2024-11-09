@@ -44,25 +44,25 @@ public class Stock {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(makeCommonString());
-        if(quantity == 0){
+        if (quantity == 0) {
             return outOfStockString(sb);
         }
         sb.append(quantity).append("개 ");
-        if(promotion.equals("null")){
+        if (promotion.equals("null")) {
             return sb.toString();
         }
         sb.append(promotion);
         return sb.toString();
     }
 
-    private String makeCommonString(){
+    private String makeCommonString() {
         DecimalFormat df = new DecimalFormat("###,###");
         return "- " + name + " " + df.format(price) + "원 ";
     }
 
-    private String outOfStockString(StringBuilder sb){
+    private String outOfStockString(StringBuilder sb) {
         sb.append("재고 없음 ");
-        if(promotion.equals("null")) {
+        if (promotion.equals("null")) {
             return sb.toString();
         }
         return sb.append(promotion).toString();

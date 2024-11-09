@@ -32,12 +32,12 @@ public class PaymentSystemController {
         this.output = output;
     }
 
-    public void clearStock(){
+    public void clearStock() {
         stocks.clear();
         promotions.clear();
     }
 
-    public void run(){
+    public void run() {
         StockRepository stockRepository = new StockRepository();
         stockService = new StockService(stockRepository);
         stocks = stockService.readStocks("src/main/resources/products.md");
@@ -50,38 +50,37 @@ public class PaymentSystemController {
         clearStock();
     }
 
-    private void order(){
-       output. printWelcomeGreeting();
-       printStocks(stocks);
-       inputAndProceedOrder();
+    private void order() {
+        output.printWelcomeGreeting();
+        printStocks(stocks);
+        inputAndProceedOrder();
     }
 
-    private void printStocks(List<Stock> stocks){
-        for(Stock stock : stocks){
+    private void printStocks(List<Stock> stocks) {
+        for (Stock stock : stocks) {
             output.printStockInformation(stock.toString());
         }
         System.out.println();
     }
 
-    private void inputAndProceedOrder(){
-        try{
+    private void inputAndProceedOrder() {
+        try {
             processOrder(StringParser.validateOrderFormat(input.inputOrder()));
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             output.printErrorMessage(e.getMessage());
             inputAndProceedOrder();
         }
         output.printInstructionsAboutAdditionalPurchase();
         if (!inputYesOrNo().equals("Y")) {
-            clearStock();
             return;
         }
         order();
     }
 
-    private String inputYesOrNo(){
-        try{
+    private String inputYesOrNo() {
+        try {
             return input.inputYesOrNo();
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             output.printErrorMessage(e.getMessage());
             return inputYesOrNo();
         }
@@ -93,40 +92,44 @@ public class PaymentSystemController {
 
         for (String stockName : orders.keySet()) {
             int quantity = orders.get(stockName);
-            List<Stock> sameNameStock = stockService.findStockByName(stocks,stockName,quantity);
-            applyPromotionPriority(receiptItems,freeGift,sameNameStock,quantity);
+            List<Stock> sameNameStock = stockService.findStockByName(stocks, stockName, quantity);
+            applyPromotionPriority(receiptItems, freeGift, sameNameStock, quantity);
         }
-        String membershipStatus = askMembership(receiptItems,freeGift);
-        printReceipt(receiptItems,freeGift,membershipStatus);
+        String membershipStatus = askMembership(receiptItems, freeGift);
+        printReceipt(receiptItems, freeGift, membershipStatus);
     }
 
-    public void applyPromotionPriority(List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,List<Stock> sameNameStock, int quantity){
-        if(sameNameStock.size()==1){
-            purchaseGeneralProduct(receiptItems,sameNameStock.getFirst(),quantity);
+    public void applyPromotionPriority(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGift,
+                                       List<Stock> sameNameStock, int quantity) {
+        if (sameNameStock.size() == 1) {
+            purchaseGeneralProduct(receiptItems, sameNameStock.getFirst(), quantity);
             return;
         }
         Stock promotionStock = sameNameStock.getFirst();
-        int remainQuantity  = applyPromotionStock(receiptItems,freeGift,promotionStock,quantity);
+        int remainQuantity = applyPromotionStock(receiptItems, freeGift, promotionStock, quantity);
 
         Stock generalStock = sameNameStock.get(1);
 
-        if(remainQuantity != 0){
-            if(remainQuantity == quantity){
-                purchaseGeneralProduct(receiptItems,generalStock,remainQuantity);
+        if (remainQuantity != 0) {
+            if (remainQuantity == quantity) {
+                purchaseGeneralProduct(receiptItems, generalStock, remainQuantity);
                 return;
             }
             generalStock.decreaseQuantity(remainQuantity);
         }
     }
 
-    public int applyPromotionStock(List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,Stock promotionStock, int quantity){
+    public int applyPromotionStock(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGift, Stock promotionStock,
+                                   int quantity) {
         int remainQuantity = quantity;
-        PromotionResult promotionResult = promotionService.applyPromotion(promotions,promotionStock.getPromotion(),promotionStock.getQuantity(),quantity);
-        if(promotionResult.getMessage().equals("만료")) {
+        PromotionResult promotionResult = promotionService.applyPromotion(promotions, promotionStock.getPromotion(),
+                promotionStock.getQuantity(), quantity);
+        if (promotionResult.getMessage().equals("만료")) {
             return remainQuantity;
         }
-        int actualNumberOfPurchases = applyPromotionResult(promotionResult, receiptItems, freeGift, promotionStock, quantity);
-        if(actualNumberOfPurchases > promotionStock.getQuantity()){
+        int actualNumberOfPurchases = applyPromotionResult(promotionResult, receiptItems, freeGift, promotionStock,
+                quantity);
+        if (actualNumberOfPurchases > promotionStock.getQuantity()) {
             remainQuantity = actualNumberOfPurchases - promotionStock.getQuantity();
             promotionStock.decreaseQuantity(promotionStock.getQuantity());
             return remainQuantity;
@@ -136,87 +139,91 @@ public class PaymentSystemController {
         return remainQuantity;
     }
 
-    public int purchaseGeneralProduct(List<ReceiptItem> receiptItems, Stock stock,int quantity){
-        if(quantity > stock.getQuantity()){
+    public void purchaseGeneralProduct(List<ReceiptItem> receiptItems, Stock stock, int quantity) {
+        if (quantity > stock.getQuantity()) {
             throw new IllegalArgumentException(INVALIDATE_AVAILABLE_STOCK_MESSAGE);
         }
-        receiptItems.add(new ReceiptItem(stock.getName(),quantity,stock.getPrice()));
+        receiptItems.add(new ReceiptItem(stock.getName(), quantity, stock.getPrice()));
         stock.decreaseQuantity(quantity);
+    }
+
+    public int applyPromotionResult(PromotionResult promotionResult, List<ReceiptItem> receiptItems,
+                                    List<ReceiptItem> freeGift, Stock stock, int quantity) {
+        if (promotionResult.getMessage().equals("추가")) {
+            return addPromotionProduct(promotionResult, receiptItems, freeGift, stock);
+        }
+        if (promotionResult.getMessage().equals("포기")) {
+            return givingUpPromotionProduct(promotionResult, receiptItems, freeGift, stock);
+        }
+        return purchaseByApplyingPromotion(receiptItems, freeGift, stock, promotionResult.getCurrentQuantity());
+    }
+
+    private int purchaseByApplyingPromotion(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGift, Stock stock,
+                                            int quantity) {
+        receiptItems.add(new ReceiptItem(stock.getName(), quantity, stock.getPrice()));
+        addFreeGift(freeGift, stock, quantity);
         return quantity;
     }
 
-    public int applyPromotionResult(PromotionResult promotionResult, List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,Stock stock, int quantity){
-        if(promotionResult.getMessage().equals("추가")){
-            return addPromotionProduct(promotionResult,receiptItems,freeGift,stock);
-        }
-        if(promotionResult.getMessage().equals("포기")){
-            return givingUpPromotionProduct(promotionResult,receiptItems,freeGift,stock);
-        }
-        return purchaseByApplyingPromotion(receiptItems,freeGift,stock,promotionResult.getCurrentQuantity());
-    }
-
-    private int purchaseByApplyingPromotion(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGift, Stock stock, int quantity){
-        receiptItems.add(new ReceiptItem(stock.getName(),quantity,stock.getPrice()));
-        addFreeGift(freeGift,stock,quantity);
-        return quantity;
-    }
-
-    private int addPromotionProduct(PromotionResult promotionResult, List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,Stock stock){
+    private int addPromotionProduct(PromotionResult promotionResult, List<ReceiptItem> receiptItems,
+                                    List<ReceiptItem> freeGift, Stock stock) {
         output.printInstructionsAboutAddProduct(stock.getName(), promotionResult.getRelateQuantity());
         String userInput = inputYesOrNo();
-        if(userInput.equals("Y")){
-            purchaseByApplyingPromotion(receiptItems,freeGift,stock,promotionResult.getTotalAddQuantity());
+        if (userInput.equals("Y")) {
+            purchaseByApplyingPromotion(receiptItems, freeGift, stock, promotionResult.getTotalAddQuantity());
             return promotionResult.getTotalAddQuantity();
         }
-        purchaseByApplyingPromotion(receiptItems,freeGift,stock,promotionResult.getCurrentQuantity());
+        purchaseByApplyingPromotion(receiptItems, freeGift, stock, promotionResult.getCurrentQuantity());
         return promotionResult.getCurrentQuantity();
     }
 
-    private int givingUpPromotionProduct(PromotionResult promotionResult, List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,Stock stock){
+    private int givingUpPromotionProduct(PromotionResult promotionResult, List<ReceiptItem> receiptItems,
+                                         List<ReceiptItem> freeGift, Stock stock) {
         output.printInstructionsAboutUnavailablePromotion(stock.getName(), promotionResult.getRelateQuantity());
         String userInput = inputYesOrNo();
-        if(userInput.equals("Y")){
-            purchaseByApplyingPromotion(receiptItems,freeGift,stock,promotionResult.getCurrentQuantity());
+        if (userInput.equals("Y")) {
+            purchaseByApplyingPromotion(receiptItems, freeGift, stock, promotionResult.getCurrentQuantity());
             return promotionResult.getCurrentQuantity();
         }
-        purchaseByApplyingPromotion(receiptItems,freeGift,stock,promotionResult.getTotalMinusQuantity());
+        purchaseByApplyingPromotion(receiptItems, freeGift, stock, promotionResult.getTotalMinusQuantity());
         return promotionResult.getTotalMinusQuantity();
     }
 
-    private void addFreeGift(List<ReceiptItem> freeGift, Stock stock, int quantity){
-        if(stock.getPromotion().matches(".*2\\+1.*")){ // 시간 되면 수정
-            if(quantity > stock.getQuantity()){
+    private void addFreeGift(List<ReceiptItem> freeGift, Stock stock, int quantity) {
+        if (stock.getPromotion().matches(".*2\\+1.*")) { // 시간 되면 수정
+            if (quantity > stock.getQuantity()) {
                 int freeQuantity = stock.getQuantity() / 3;
-                if(freeQuantity > 0){
-                    freeGift.add(new ReceiptItem(stock.getName(),freeQuantity,stock.getPrice()));
+                if (freeQuantity > 0) {
+                    freeGift.add(new ReceiptItem(stock.getName(), freeQuantity, stock.getPrice()));
                     return;
                 }
             }
             int freeQuantity = quantity / 3;
-            if(freeQuantity > 0){
-                freeGift.add(new ReceiptItem(stock.getName(),freeQuantity,stock.getPrice()));
+            if (freeQuantity > 0) {
+                freeGift.add(new ReceiptItem(stock.getName(), freeQuantity, stock.getPrice()));
                 return;
             }
         }
-        if(quantity > stock.getQuantity()){
+        if (quantity > stock.getQuantity()) {
             int freeQuantity = stock.getQuantity() / 2;
-            if(freeQuantity > 0){
-                freeGift.add(new ReceiptItem(stock.getName(),freeQuantity,stock.getPrice()));
+            if (freeQuantity > 0) {
+                freeGift.add(new ReceiptItem(stock.getName(), freeQuantity, stock.getPrice()));
                 return;
             }
         }
         int freeQuantity = quantity / 2;
-        if(freeQuantity > 0) {
+        if (freeQuantity > 0) {
             freeGift.add(new ReceiptItem(stock.getName(), freeQuantity, stock.getPrice()));
         }
     }
 
-    private String askMembership(List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift){
+    private String askMembership(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGift) {
         output.printInstructionsAboutMembership();
         return inputYesOrNo();
     }
 
-    private int calculateMembershipAmount(List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,String membershipStatus){
+    private int calculateMembershipAmount(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGift,
+                                          String membershipStatus) {
         int total = 0;
         for (ReceiptItem receiptItem : receiptItems) {
             boolean isFreeGift = freeGift.stream()
@@ -225,25 +232,27 @@ public class PaymentSystemController {
                 total += receiptItem.getTotalPrice();
             }
         }
-        return MembershipDiscount.applyMembershipDiscount(membershipStatus,total);
+        return MembershipDiscount.applyMembershipDiscount(membershipStatus, total);
     }
 
-    private void printReceipt(List<ReceiptItem> receiptItems,List<ReceiptItem> freeGifts,String membershipStatus){
-        Receipt receipt = new Receipt(receiptItems,freeGifts,membershipStatus);
+    private void printReceipt(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGifts, String membershipStatus) {
+        Receipt receipt = new Receipt(receiptItems, freeGifts, membershipStatus);
         output.printPurchaseInformation(receiptItems);
-        calculate(receiptItems,freeGifts,membershipStatus,receipt);
+        calculate(receiptItems, freeGifts, membershipStatus, receipt);
     }
 
-    private void calculate(List<ReceiptItem> receiptItems,List<ReceiptItem> freeGifts,String membershipStatus,Receipt receipt){
+    private void calculate(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGifts, String membershipStatus,
+                           Receipt receipt) {
         int totalPromotionAmount = 0;
 
-        if(!freeGifts.isEmpty()){
+        if (!freeGifts.isEmpty()) {
             output.printPromotionInfomation(freeGifts);
             totalPromotionAmount = receipt.getTotalPromotionAmount();
         }
         int totalAmount = receipt.getTotalAmount();
-        int membershipAmount = calculateMembershipAmount(receiptItems,freeGifts,membershipStatus);
+        int membershipAmount = calculateMembershipAmount(receiptItems, freeGifts, membershipStatus);
         int totalMoneyToBePaid = totalAmount - totalPromotionAmount - membershipAmount;
-        output.printMoneyInformation(totalAmount,receipt.getTotalQuantity(),totalPromotionAmount,membershipAmount,totalMoneyToBePaid);
+        output.printMoneyInformation(totalAmount, receipt.getTotalQuantity(), totalPromotionAmount, membershipAmount,
+                totalMoneyToBePaid);
     }
 }
