@@ -19,7 +19,15 @@ public class PromotionResult {
         return currentQuantity;
     }
 
-    public int getBonusQuantity() {
+    public int getRelateQuantity() {
         return relateQuantity;
+    }
+
+    public int getTotalAddQuantity(){
+        return currentQuantity+relateQuantity;
+    }
+
+    public int getTotalMinusQuantity(){
+        return currentQuantity-relateQuantity;
     }
 }
