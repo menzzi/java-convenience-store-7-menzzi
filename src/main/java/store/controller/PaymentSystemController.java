@@ -3,7 +3,9 @@ package store.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import store.model.domain.MembershipDiscount;
 import store.model.domain.PromotionResult;
+import store.model.domain.Receipt;
 import store.model.domain.ReceiptItem;
 import store.model.domain.Stock;
 import store.model.service.PromotionService;
@@ -53,8 +55,9 @@ public class PaymentSystemController {
             int quantity = orders.get(stockName);
             List<Stock> sameNameStock = StockService.findStockByName(stocks,stockName,quantity);
             applyPromotionPriority(receiptItems,freeGift,sameNameStock,quantity);
-            // 재고서비스에서 수량 업데이트하는 메서드 구현
         }
+        String membershipStatus = askMembership(receiptItems,freeGift);
+        printReceipt(receiptItems,freeGift,membershipStatus);
     }
 
     public void printStocks(List<Stock> stocks){
@@ -86,7 +89,7 @@ public class PaymentSystemController {
                 stock.decreaseQuantity(ActualNumberOfPurchases);
             }
             if(isRemain){
-                purchaseGeneralProduct(receiptItems,stock,quantity);
+                remainQuantity -= purchaseGeneralProduct(receiptItems,stock,quantity);
             }
             if(remainQuantity != 0){
                 stock.decreaseQuantity(remainQuantity);
@@ -105,7 +108,7 @@ public class PaymentSystemController {
 
     public int applyPromotionResult(PromotionResult promotionResult, List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,Stock stock, int quantity){
         if(promotionResult.getMessage().equals("추가")){
-            addPromotionProduct(promotionResult,receiptItems,freeGift,stock);
+            return addPromotionProduct(promotionResult,receiptItems,freeGift,stock);
         }
         if(promotionResult.getMessage().equals("포기")){
             return givingUpPromotionProduct(promotionResult,receiptItems,freeGift,stock);
@@ -152,5 +155,43 @@ public class PaymentSystemController {
         if(freeQuantity > 0) {
             freeGift.add(new ReceiptItem(stock.getName(), freeQuantity, stock.getPrice()));
         }
+    }
+
+    private String askMembership(List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift){
+        if(receiptItems.size() > freeGift.size()){
+            output.printInstructionsAboutMembership();
+            return input.inputYesOrNo();
+        }
+        return "N";
+    }
+
+    private int calculateMembershipAmount(List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,String membershipStatus){
+        int total = 0;
+        for (ReceiptItem receiptItem : receiptItems) {
+            boolean isFreeGift = freeGift.stream()
+                    .anyMatch(gift -> gift.getItemName().equals(receiptItem.getItemName()));
+            if (!isFreeGift) {
+                total += receiptItem.getTotalPrice();
+            }
+        }
+        return MembershipDiscount.applyMembershipDiscount(membershipStatus,total);
+    }
+
+    private void printReceipt(List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,String membershipStatus){
+        Receipt receipt = new Receipt(receiptItems,freeGift,membershipStatus);
+        output.printPurchaseInformation(receiptItems);
+        calculate(receiptItems,freeGift,membershipStatus,receipt);
+    }
+
+    private void calculate(List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,String membershipStatus,Receipt receipt){
+        int totalPromotionAmount = 0;
+        if(!freeGift.isEmpty()){
+            output.printPromotionInfomation(freeGift);
+            totalPromotionAmount = receipt.getTotalPromotionAmount();
+        }
+        int totalAmount = receipt.getTotalAmount();
+        int membershipAmount = calculateMembershipAmount(receiptItems,freeGift,membershipStatus);
+        int totalMoneyToBePaid = totalAmount - totalPromotionAmount - membershipAmount;
+        output.printMoneyInformation(totalAmount,receipt.getTotalQuantity(),totalPromotionAmount,membershipAmount,totalMoneyToBePaid);
     }
 }

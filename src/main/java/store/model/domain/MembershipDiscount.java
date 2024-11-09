@@ -14,7 +14,7 @@ public enum MembershipDiscount {
         this.maximumLimit = maximumLimit;
     }
 
-    public int applyMembershipDiscount(String input, int amount){
+    public static int applyMembershipDiscount(String input, int amount){
         if(input.equals(MEMBERSHIP_DISCOUNT.YesOrNo)){
             int membershipDiscountAmount = (int)(amount * MEMBERSHIP_DISCOUNT.discountRate);
             return Math.min(membershipDiscountAmount, MEMBERSHIP_DISCOUNT.maximumLimit);

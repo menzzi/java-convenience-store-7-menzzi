@@ -1,5 +1,9 @@
 package store.view;
 
+import java.text.DecimalFormat;
+import java.util.List;
+import store.model.domain.ReceiptItem;
+
 public class OutputView {
     private final String ERROR_FORMAT = "[ERROR]";
     private final String BENEFIT_INSTRUCTIONS_MESSAGE = "멤버십 할인을 받으시겠습니까? (Y/N)";
@@ -40,5 +44,30 @@ public class OutputView {
 
     public void printErrorMessage(String errorMessage){
         System.out.println(ERROR_FORMAT + errorMessage);
+    }
+
+    public void printPurchaseInformation(List<ReceiptItem> receiptItems){
+        System.out.println("===========W 편의점=============");
+        System.out.println("상품명\t\t수량\t금액");
+        for (ReceiptItem item : receiptItems) {
+            System.out.printf("%s\t\t%d\t%,d원%n", item.getItemName(), item.getItemQuantity(), item.getTotalPrice());
+        }
+    }
+
+    public void printPromotionInfomation(List<ReceiptItem> freeGift){
+        System.out.println("===========증\t정=============");
+        for (ReceiptItem item : freeGift) {
+            System.out.printf("%s\t\t%d%n", item.getItemName(), item.getItemQuantity());
+        }
+    }
+
+    public void printMoneyInformation(int totalAmount, int totalCount,int totalPromotionAmount, int membershipAmount, int totalMoneyToBePaid){
+        DecimalFormat df = new DecimalFormat("###,###");
+
+        System.out.println("==============================");
+        System.out.printf("총구매액\t\t%d\t%s%n",totalCount, df.format(totalAmount));
+        System.out.printf("행사할인\t\t\t-%s%n", df.format(totalPromotionAmount));
+        System.out.printf("멤버십할인\t\t\t-%s%n", df.format(membershipAmount));
+        System.out.printf("내실돈\t\t\t%s%n", df.format(totalMoneyToBePaid));
     }
 }

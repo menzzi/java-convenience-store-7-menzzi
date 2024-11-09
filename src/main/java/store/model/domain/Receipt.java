@@ -4,14 +4,12 @@ import java.util.List;
 
 public class Receipt {
     private List<ReceiptItem> receiptItems;
-    private ReceiptItem freeGift;
-    private final int eventDiscount;
-    private final int membershipDiscount;
+    private List<ReceiptItem> freeGifts;
+    private final String membershipDiscount;
 
-    public Receipt(List<ReceiptItem> receiptItems, ReceiptItem freeGift, int eventDiscount, int membershipDiscount){
+    public Receipt(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGifs, String membershipDiscount){
         this.receiptItems = receiptItems;
-        this.freeGift = freeGift;
-        this.eventDiscount = eventDiscount;
+        this.freeGifts = freeGifts;
         this.membershipDiscount = membershipDiscount;
     }
 
@@ -19,15 +17,15 @@ public class Receipt {
         return receiptItems.stream().mapToInt(ReceiptItem::getTotalPrice).sum();
     }
 
+    public int getTotalPromotionAmount(){
+        return freeGifts.stream().mapToInt(ReceiptItem::getTotalPrice).sum();
+    }
+
     public int getTotalQuantity(){
         return receiptItems.stream().mapToInt(ReceiptItem::getItemQuantity).sum();
     }
 
-    public int getFinalAmount(){
-        return getTotalAmount() - eventDiscount - membershipDiscount;
-    }
-
-    public ReceiptItem getFreeGift() {
-        return freeGift;
+    public String membershipDiscount() {
+        return membershipDiscount;
     }
 }
