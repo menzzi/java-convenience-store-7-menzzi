@@ -55,7 +55,7 @@ public class PromotionService {
             return checkRemainderTwoPlusOne(stockQuantity,quantity,remainder);
         }
         int applyQuantity = (stockQuantity/3) * 3;
-        return new PromotionResult("포기", applyQuantity,quantity-applyQuantity);
+        return new PromotionResult("포기", quantity,quantity-applyQuantity);
     }
 
     public PromotionResult calculateAvailableQuantityOnePlusOne(int stockQuantity, int quantity){
@@ -67,7 +67,7 @@ public class PromotionService {
             return checkAdditionalAvailabilityOne(stockQuantity,quantity,false);
         }
         int applyQuantity = (stockQuantity/2) * 2;
-        return new PromotionResult("포기", applyQuantity,quantity-applyQuantity);
+        return new PromotionResult("포기", quantity,quantity-applyQuantity);
     }
 
     public PromotionResult checkRemainderTwoPlusOne(int stockQuantity,int quantity, int remainder){

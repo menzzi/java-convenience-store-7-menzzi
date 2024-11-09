@@ -4,15 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Receipt {
-    private List<ReceiptItem> receiptItems;
-    private List<ReceiptItem> freeGifts;
+    private final List<ReceiptItem> receiptItems;
+    private final List<ReceiptItem> freeGifts;
     private final String membershipDiscount;
 
-    public Receipt(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGifs, String membershipDiscount){
+    public Receipt(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGifts, String membershipDiscount){
         this.receiptItems = receiptItems;
-        if (freeGifts == null) {
-            freeGifts = new ArrayList<>();
-        }
         this.freeGifts = freeGifts;
         this.membershipDiscount = membershipDiscount;
     }
@@ -22,9 +19,6 @@ public class Receipt {
     }
 
     public int getTotalPromotionAmount(){
-        if (freeGifts == null) {
-            freeGifts = new ArrayList<>();
-        }
         return freeGifts.stream().mapToInt(ReceiptItem::getTotalPrice).sum();
     }
 

@@ -113,9 +113,11 @@ public class PaymentSystemController {
                     continue;
                 }
                 stock.decreaseQuantity(ActualNumberOfPurchases);
+                remainQuantity = 0;
             }
             if(isRemain){
                 remainQuantity -= purchaseGeneralProduct(receiptItems,stock,quantity);
+                isRemain = false;
             }
             if(remainQuantity != 0){
                 stock.decreaseQuantity(remainQuantity);
@@ -161,6 +163,7 @@ public class PaymentSystemController {
 
     private int givingUpPromotionProduct(PromotionResult promotionResult, List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,Stock stock){
         output.printInstructionsAboutUnavailablePromotion(stock.getName(), promotionResult.getRelateQuantity());
+        System.out.println();
         String userInput = inputYesOrNo();
         if(userInput.equals("Y")){
             purchaseByApplyingPromotion(receiptItems,freeGift,stock,promotionResult.getCurrentQuantity());
@@ -172,9 +175,24 @@ public class PaymentSystemController {
 
     private void addFreeGift(List<ReceiptItem> freeGift, Stock stock, int quantity){
         if(stock.getPromotion().matches(".*2\\+1.*")){ // 시간 되면 수정
+            if(quantity > stock.getQuantity()){
+                int freeQuantity = stock.getQuantity() / 3;
+                if(freeQuantity > 0){
+                    freeGift.add(new ReceiptItem(stock.getName(),freeQuantity,stock.getPrice()));
+                    return;
+                }
+            }
             int freeQuantity = quantity / 3;
             if(freeQuantity > 0){
                 freeGift.add(new ReceiptItem(stock.getName(),freeQuantity,stock.getPrice()));
+                return;
+            }
+        }
+        if(quantity > stock.getQuantity()){
+            int freeQuantity = stock.getQuantity() / 2;
+            if(freeQuantity > 0){
+                freeGift.add(new ReceiptItem(stock.getName(),freeQuantity,stock.getPrice()));
+                return;
             }
         }
         int freeQuantity = quantity / 2;
@@ -184,11 +202,8 @@ public class PaymentSystemController {
     }
 
     private String askMembership(List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift){
-        if(receiptItems.size() > freeGift.size()){
-            output.printInstructionsAboutMembership();
-            return inputYesOrNo();
-        }
-        return "N";
+        output.printInstructionsAboutMembership();
+        return inputYesOrNo();
     }
 
     private int calculateMembershipAmount(List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,String membershipStatus){
@@ -203,21 +218,21 @@ public class PaymentSystemController {
         return MembershipDiscount.applyMembershipDiscount(membershipStatus,total);
     }
 
-    private void printReceipt(List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,String membershipStatus){
-        Receipt receipt = new Receipt(receiptItems,freeGift,membershipStatus);
+    private void printReceipt(List<ReceiptItem> receiptItems,List<ReceiptItem> freeGifts,String membershipStatus){
+        Receipt receipt = new Receipt(receiptItems,freeGifts,membershipStatus);
         output.printPurchaseInformation(receiptItems);
-        calculate(receiptItems,freeGift,membershipStatus,receipt);
+        calculate(receiptItems,freeGifts,membershipStatus,receipt);
     }
 
-    private void calculate(List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,String membershipStatus,Receipt receipt){
+    private void calculate(List<ReceiptItem> receiptItems,List<ReceiptItem> freeGifts,String membershipStatus,Receipt receipt){
         int totalPromotionAmount = 0;
 
-        if(!freeGift.isEmpty()){
-            output.printPromotionInfomation(freeGift);
+        if(!freeGifts.isEmpty()){
+            output.printPromotionInfomation(freeGifts);
             totalPromotionAmount = receipt.getTotalPromotionAmount();
         }
         int totalAmount = receipt.getTotalAmount();
-        int membershipAmount = calculateMembershipAmount(receiptItems,freeGift,membershipStatus);
+        int membershipAmount = calculateMembershipAmount(receiptItems,freeGifts,membershipStatus);
         int totalMoneyToBePaid = totalAmount - totalPromotionAmount - membershipAmount;
         output.printMoneyInformation(totalAmount,receipt.getTotalQuantity(),totalPromotionAmount,membershipAmount,totalMoneyToBePaid);
     }

@@ -67,10 +67,10 @@ public class PromotionServiceTest {
                 new Promotion("반짝할인", 1,1,"2024-11-01", "2024-11-30")
         );
 
-        PromotionResult result = promotionService.applyPromotion(promotions, "2+1", 5, 7);
+        PromotionResult result = promotionService.applyPromotion(promotions, "2+1", 7, 10);
 
         assertEquals("포기", result.getMessage());
-        assertEquals(3,result.getCurrentQuantity());
+        assertEquals(6,result.getCurrentQuantity());
         assertEquals(4,result.getRelateQuantity());
     }
 
