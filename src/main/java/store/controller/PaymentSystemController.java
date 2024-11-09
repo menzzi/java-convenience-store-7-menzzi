@@ -163,7 +163,6 @@ public class PaymentSystemController {
 
     private int givingUpPromotionProduct(PromotionResult promotionResult, List<ReceiptItem> receiptItems,List<ReceiptItem> freeGift,Stock stock){
         output.printInstructionsAboutUnavailablePromotion(stock.getName(), promotionResult.getRelateQuantity());
-        System.out.println();
         String userInput = inputYesOrNo();
         if(userInput.equals("Y")){
             purchaseByApplyingPromotion(receiptItems,freeGift,stock,promotionResult.getCurrentQuantity());
