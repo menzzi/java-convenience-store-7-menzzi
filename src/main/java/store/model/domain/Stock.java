@@ -27,12 +27,18 @@ public class Stock {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
     public String getPromotion() {
         return promotion;
+    }
+
+    public void decreaseQuantity(int amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException();
+        }
+        if (amount > this.quantity) {
+            throw new IllegalArgumentException();
+        }
+        this.quantity -= amount;
     }
 
     @Override
