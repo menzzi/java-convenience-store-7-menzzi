@@ -1,6 +1,5 @@
 package store.model.domain;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Receipt {
@@ -26,7 +25,15 @@ public class Receipt {
         return receiptItems.stream().mapToInt(ReceiptItem::getItemQuantity).sum();
     }
 
-    public String membershipDiscount() {
+    public String getMembershipDiscount() {
         return membershipDiscount;
+    }
+
+    public List<ReceiptItem> getReceiptItems() {
+        return receiptItems;
+    }
+
+    public List<ReceiptItem> getFreeGifts() {
+        return freeGifts;
     }
 }

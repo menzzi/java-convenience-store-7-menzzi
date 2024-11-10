@@ -235,19 +235,18 @@ public class PaymentSystemController {
     private void printReceipt(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGifts, String membershipStatus) {
         Receipt receipt = new Receipt(receiptItems, freeGifts, membershipStatus);
         output.printPurchaseInformation(receiptItems);
-        calculate(receiptItems, freeGifts, membershipStatus, receipt);
+        calculate(receipt);
     }
 
-    private void calculate(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGifts, String membershipStatus,
-                           Receipt receipt) {
+    private void calculate(Receipt receipt) {
         int totalPromotionAmount = 0;
 
-        if (!freeGifts.isEmpty()) {
-            output.printPromotionInfomation(freeGifts);
+        if (!receipt.getFreeGifts().isEmpty()) {
+            output.printPromotionInfomation(receipt.getFreeGifts());
             totalPromotionAmount = receipt.getTotalPromotionAmount();
         }
         int totalAmount = receipt.getTotalAmount();
-        int membershipAmount = calculateMembershipAmount(receiptItems, freeGifts, membershipStatus);
+        int membershipAmount = calculateMembershipAmount(receipt.getReceiptItems(), receipt.getFreeGifts(), receipt.getMembershipDiscount());
         int totalMoneyToBePaid = totalAmount - totalPromotionAmount - membershipAmount;
         output.printMoneyInformation(totalAmount, receipt.getTotalQuantity(), totalPromotionAmount, membershipAmount,
                 totalMoneyToBePaid);
