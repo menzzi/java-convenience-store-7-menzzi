@@ -72,7 +72,9 @@ public class PaymentSystemController {
             inputAndProceedOrder();
         }
         output.printInstructionsAboutAdditionalPurchase();
-        if (!inputYesOrNo().equals("Y")) return;
+        if (!inputYesOrNo().equals("Y")) {
+            return;
+        }
         order();
     }
 
@@ -104,7 +106,7 @@ public class PaymentSystemController {
     }
 
     private void applyPromotionPriority(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGift,
-                                       List<Stock> sameNameStock, int quantity) {
+                                        List<Stock> sameNameStock, int quantity) {
         if (sameNameStock.size() == 1) {
             purchaseGeneralProduct(receiptItems, sameNameStock.getFirst(), quantity);
             return;
@@ -135,7 +137,8 @@ public class PaymentSystemController {
         stock.decreaseQuantity(quantity);
     }
 
-    private int purchasePromotionProduct(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGift, Stock promotionStock,
+    private int purchasePromotionProduct(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGift,
+                                         Stock promotionStock,
                                          int quantity) {
         PromotionResult promotionResult = promotionService.applyPromotion(promotions, promotionStock.getPromotion(),
                 promotionStock.getQuantity(), quantity);
@@ -157,14 +160,15 @@ public class PaymentSystemController {
     }
 
     private int applyPromotionResult(PromotionResult promotionResult, List<ReceiptItem> receiptItems,
-                                    List<ReceiptItem> freeGift, Stock promotionStock) {
+                                     List<ReceiptItem> freeGift, Stock promotionStock) {
         if (promotionResult.getStatus() == PromotionStatus.ADDITIONAL) {
             return additionalPromotionProduct(promotionResult, receiptItems, freeGift, promotionStock);
         }
         if (promotionResult.getStatus() == PromotionStatus.GIVE_UP) {
             return givingUpPromotionProduct(promotionResult, receiptItems, freeGift, promotionStock);
         }
-        return purchaseByApplyingPromotion(receiptItems, freeGift, promotionStock, promotionResult.getCurrentQuantity());
+        return purchaseByApplyingPromotion(receiptItems, freeGift, promotionStock,
+                promotionResult.getCurrentQuantity());
     }
 
     private int purchaseByApplyingPromotion(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGift, Stock stock,
@@ -200,13 +204,13 @@ public class PaymentSystemController {
 
     private void addFreeGift(List<ReceiptItem> freeGift, Stock stock, int quantity) {
         if (stock.getPromotion().matches(".*2\\+1.*")) { // 시간 되면 수정
-            addFreeGiftCommonPart(freeGift,stock,quantity,3);
+            addFreeGiftCommonPart(freeGift, stock, quantity, 3);
             return;
         }
-        addFreeGiftCommonPart(freeGift,stock,quantity,2);
+        addFreeGiftCommonPart(freeGift, stock, quantity, 2);
     }
 
-    private void addFreeGiftCommonPart(List<ReceiptItem> freeGift, Stock stock, int quantity, int dividingNumber){
+    private void addFreeGiftCommonPart(List<ReceiptItem> freeGift, Stock stock, int quantity, int dividingNumber) {
         if (quantity > stock.getQuantity()) {
             addFreeGiftRealPart(freeGift, stock, stock.getQuantity(), dividingNumber);
             return;
@@ -235,7 +239,8 @@ public class PaymentSystemController {
             totalPromotionAmount = receipt.getTotalPromotionAmount();
         }
         int totalAmount = receipt.getTotalAmount();
-        int membershipAmount = calculateMembershipAmount(receipt.receiptItems(), receipt.freeGifts(), receipt.membershipDiscount());
+        int membershipAmount = calculateMembershipAmount(receipt.receiptItems(), receipt.freeGifts(),
+                receipt.membershipDiscount());
         int totalMoneyToBePaid = totalAmount - totalPromotionAmount - membershipAmount;
         output.printMoneyInformation(totalAmount, receipt.getTotalQuantity(), totalPromotionAmount, membershipAmount,
                 totalMoneyToBePaid);
