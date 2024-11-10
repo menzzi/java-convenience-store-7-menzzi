@@ -7,9 +7,10 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import store.model.domain.Promotion;
 import store.model.domain.PromotionResult;
-import store.service.PromotionService;
 
 public class PromotionServiceTest {
     private PromotionService promotionService;
@@ -32,46 +33,24 @@ public class PromotionServiceTest {
         assertEquals("반짝할인", result.getName());
     }
 
-    @Test
-    public void 투플러스원_프로모션_적용1() {
+    @ParameterizedTest
+    @CsvSource({
+            "2+1, 6, 4, 추가, 4, 2",
+            "2+1, 5, 4, 포기, 4, 1",
+            "2+1, 7, 10, 포기, 10, 4"
+    })
+    public void 투플러스원_프로모션_적용(String promotionName, int stockQuantity, int quantity, String expected1, int expected2,
+                               int expected3) {
         List<Promotion> promotions = Arrays.asList(
                 new Promotion("2+1", 2, 1, "2024-11-01", "2024-12-31"),
                 new Promotion("반짝할인", 1, 1, "2024-11-01", "2024-11-30")
         );
 
-        PromotionResult result = promotionService.applyPromotion(promotions, "2+1", 6, 4);
+        PromotionResult result = promotionService.applyPromotion(promotions, promotionName, stockQuantity, quantity);
 
-        assertEquals("추가", result.getStatus().getStatusMessage());
-        assertEquals(4, result.getCurrentQuantity());
-        assertEquals(2, result.getRelateQuantity());
-    }
-
-    @Test
-    public void 투플러스원_프로모션_적용2() {
-        List<Promotion> promotions = Arrays.asList(
-                new Promotion("2+1", 2, 1, "2024-11-01", "2024-12-31"),
-                new Promotion("반짝할인", 1, 1, "2024-11-01", "2024-11-30")
-        );
-
-        PromotionResult result = promotionService.applyPromotion(promotions, "2+1", 5, 4);
-
-        assertEquals("포기", result.getStatus().getStatusMessage());
-        assertEquals(4, result.getCurrentQuantity());
-        assertEquals(1, result.getRelateQuantity());
-    }
-
-    @Test
-    public void 투플러스원_프로모션_적용3() {
-        List<Promotion> promotions = Arrays.asList(
-                new Promotion("2+1", 2, 1, "2024-11-01", "2024-12-31"),
-                new Promotion("반짝할인", 1, 1, "2024-11-01", "2024-11-30")
-        );
-
-        PromotionResult result = promotionService.applyPromotion(promotions, "2+1", 7, 10);
-
-        assertEquals("포기", result.getStatus().getStatusMessage());
-        assertEquals(10, result.getCurrentQuantity());
-        assertEquals(4, result.getRelateQuantity());
+        assertEquals(expected1, result.getStatus().getStatusMessage());
+        assertEquals(expected2, result.getCurrentQuantity());
+        assertEquals(expected3, result.getRelateQuantity());
     }
 
     @Test
