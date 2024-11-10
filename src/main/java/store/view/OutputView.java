@@ -1,19 +1,16 @@
 package store.view;
 
+import static store.view.OutputMessage.*;
+
 import java.text.DecimalFormat;
 import java.util.List;
 import store.model.domain.ReceiptItem;
 
 public class OutputView {
-    private final String ERROR_FORMAT = "[ERROR]";
-    private final String UNAVAILBLE_PROMOTION_INSTRUCTIONS_MESSAGE = "프로모션 할인이 적용되지 않습니다. 그래도 구매하시겠습니까? (Y/N)";
-    private final String ADD_PRODUCT_INSTRUCTIONS_MESSAGE = "무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)";
-    private final String MEMBERSHIP_INSTRUCTIONS_MESSAGE = "멤버십 할인을 받으시겠습니까? (Y/N)";
-    private final String ADDITIONAL_PURCHASE_INSTRUCTIONS_MESSAGE = "감사합니다. 구매하고 싶은 다른 상품이 있나요? (Y/N)";
 
     public void printWelcomeGreeting() {
-        System.out.println("안녕하세요. W편의점입니다.");
-        System.out.println("현재 보유하고 있는 상품입니다.");
+        System.out.println(WELCOME_GREETING);
+        System.out.println(STOCK_INFORMATION);
         System.out.println();
     }
 
@@ -47,7 +44,7 @@ public class OutputView {
     public void printPurchaseInformation(List<ReceiptItem> receiptItems) {
         DecimalFormat df = new DecimalFormat("###,###");
 
-        System.out.println("===========W 편의점=============");
+        System.out.println(FIRST_LINE_OF_RECEIPT);
         System.out.printf("%-12s\t%-5s\t%-10s\n", "상품명", "수량", "금액");
         for (ReceiptItem item : receiptItems) {
             System.out.printf("%-12s\t%-5d\t%-10s\n", item.getItemName(), item.getItemQuantity(),
@@ -56,7 +53,7 @@ public class OutputView {
     }
 
     public void printPromotionInfomation(List<ReceiptItem> freeGift) {
-        System.out.println("===========증\t정=============");
+        System.out.println(SECOND_LINE_OF_RECEIPT);
         for (ReceiptItem item : freeGift) {
             System.out.printf("%-12s\t%-5d\n", item.getItemName(), item.getItemQuantity());
         }
@@ -66,11 +63,11 @@ public class OutputView {
                                       int totalMoneyToBePaid) {
         DecimalFormat df = new DecimalFormat("###,###");
 
-        System.out.println("==============================");
-        System.out.printf("%-12s\t%-5d\t%-10s\n", "총구매액", totalCount, df.format(totalAmount));
-        System.out.printf("%-20s\t%-10s\n", "행사할인", "-" + df.format(totalPromotionAmount));
-        System.out.printf("%-20s\t%-10s\n", "멤버십할인", "-" + df.format(membershipAmount));
-        System.out.printf("%-20s\t%-10s\n", "내실돈", df.format(totalMoneyToBePaid));
+        System.out.println(THIRD_LINE_OF_RECEIPT);
+        System.out.printf("%-12s\t%-5d\t%-10s\n", TOTAL_PURCHASE_AMOUNT, totalCount, df.format(totalAmount));
+        System.out.printf("%-20s\t%-10s\n", PROMOTION_DISCOUNT, "-" + df.format(totalPromotionAmount));
+        System.out.printf("%-20s\t%-10s\n", MEMBERSHIP_DISCOUNT, "-" + df.format(membershipAmount));
+        System.out.printf("%-20s\t%-10s\n", MONEY_TO_BE_PAY, df.format(totalMoneyToBePaid));
         System.out.println();
     }
 }

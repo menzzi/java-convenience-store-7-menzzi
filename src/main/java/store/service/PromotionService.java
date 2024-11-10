@@ -42,7 +42,7 @@ public class PromotionService {
         }
         return new PromotionResult("만료", 0, 0);
     }
-    
+
     private boolean findPromotionStatus(String start_date, String end_date) {
         LocalDateTime now_date = DateTimes.now();
 
