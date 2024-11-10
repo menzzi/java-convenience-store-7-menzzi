@@ -1,4 +1,4 @@
-package store.model;
+package store.model.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -7,7 +7,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import store.model.domain.Stock;
-import store.model.repository.StockRepository;
 
 public class StockRepositoryTest {
     private StockRepository stockRepository;

@@ -1,9 +1,8 @@
-package store.model;
+package store.model.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import store.model.domain.MembershipDiscount;
 
 public class MembershipDiscountTest {
 
