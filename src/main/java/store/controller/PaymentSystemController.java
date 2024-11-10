@@ -154,8 +154,7 @@ public class PaymentSystemController {
             return remainQuantity;
         }
         promotionStock.decreaseQuantity(actualNumberOfPurchases);
-        remainQuantity -= actualNumberOfPurchases;
-        return remainQuantity;
+        return 0;
     }
 
     private int applyPromotionResult(PromotionResult promotionResult, List<ReceiptItem> receiptItems,
@@ -163,7 +162,7 @@ public class PaymentSystemController {
         if (promotionResult.getStatus() == PromotionStatus.ADDITIONAL) {
             return addPromotionProduct(promotionResult, receiptItems, freeGift, stock);
         }
-        if (promotionResult.getStatus()== PromotionStatus.GIVE_UP) {
+        if (promotionResult.getStatus() == PromotionStatus.GIVE_UP) {
             return givingUpPromotionProduct(promotionResult, receiptItems, freeGift, stock);
         }
         return purchaseByApplyingPromotion(receiptItems, freeGift, stock, promotionResult.getCurrentQuantity());
@@ -202,18 +201,21 @@ public class PaymentSystemController {
 
     private void addFreeGift(List<ReceiptItem> freeGift, Stock stock, int quantity) {
         if (stock.getPromotion().matches(".*2\\+1.*")) { // 시간 되면 수정
-            if (quantity > stock.getQuantity()) {
-                addFreeGiftCommonPart(freeGift, stock, stock.getQuantity(), 3);
-            }
-            addFreeGiftCommonPart(freeGift, stock, quantity, 3);
+            addFreeGiftCommonPart(freeGift,stock,quantity,3);
+            return;
         }
-        if (quantity > stock.getQuantity()) {
-            addFreeGiftCommonPart(freeGift, stock, stock.getQuantity(), 2);
-        }
-        addFreeGiftCommonPart(freeGift, stock, quantity, 2);
+        addFreeGiftCommonPart(freeGift,stock,quantity,2);
     }
 
-    private void addFreeGiftCommonPart(List<ReceiptItem> freeGift, Stock stock, int quantity, int dividingNumber) {
+    private void addFreeGiftCommonPart(List<ReceiptItem> freeGift, Stock stock, int quantity, int dividingNumber){
+        if (quantity > stock.getQuantity()) {
+            addFreeGiftRealPart(freeGift, stock, stock.getQuantity(), dividingNumber);
+            return;
+        }
+        addFreeGiftRealPart(freeGift, stock, quantity, dividingNumber);
+    }
+
+    private void addFreeGiftRealPart(List<ReceiptItem> freeGift, Stock stock, int quantity, int dividingNumber) {
         int freeQuantity = quantity / dividingNumber;
         if (freeQuantity > 0) {
             freeGift.add(new ReceiptItem(stock.getName(), freeQuantity, stock.getPrice()));
