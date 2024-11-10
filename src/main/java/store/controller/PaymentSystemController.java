@@ -71,9 +71,7 @@ public class PaymentSystemController {
             inputAndProceedOrder();
         }
         output.printInstructionsAboutAdditionalPurchase();
-        if (!inputYesOrNo().equals("Y")) {
-            return;
-        }
+        if (!inputYesOrNo().equals("Y")) return;
         order();
     }
 
@@ -86,7 +84,7 @@ public class PaymentSystemController {
         }
     }
 
-    public void processOrder(Map<String, Integer> orders) {
+    private void processOrder(Map<String, Integer> orders) {
         List<ReceiptItem> receiptItems = new ArrayList<>();
         List<ReceiptItem> freeGift = new ArrayList<>();
 
@@ -95,11 +93,16 @@ public class PaymentSystemController {
             List<Stock> sameNameStock = stockService.findStockByName(stocks, stockName, quantity);
             applyPromotionPriority(receiptItems, freeGift, sameNameStock, quantity);
         }
-        String membershipStatus = askMembership(receiptItems, freeGift);
+        String membershipStatus = askMembership();
         printReceipt(receiptItems, freeGift, membershipStatus);
     }
 
-    public void applyPromotionPriority(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGift,
+    private String askMembership() {
+        output.printInstructionsAboutMembership();
+        return inputYesOrNo();
+    }
+
+    private void applyPromotionPriority(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGift,
                                        List<Stock> sameNameStock, int quantity) {
         if (sameNameStock.size() == 1) {
             purchaseGeneralProduct(receiptItems, sameNameStock.getFirst(), quantity);
@@ -109,7 +112,11 @@ public class PaymentSystemController {
         int remainQuantity = applyPromotionStock(receiptItems, freeGift, promotionStock, quantity);
 
         Stock generalStock = sameNameStock.get(1);
+        handlingRemainingQuantity(remainQuantity, quantity, receiptItems, generalStock);
+    }
 
+    private void handlingRemainingQuantity(int remainQuantity, int quantity, List<ReceiptItem> receiptItems,
+                                           Stock generalStock) {
         if (remainQuantity != 0) {
             if (remainQuantity == quantity) {
                 purchaseGeneralProduct(receiptItems, generalStock, remainQuantity);
@@ -119,16 +126,27 @@ public class PaymentSystemController {
         }
     }
 
-    public int applyPromotionStock(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGift, Stock promotionStock,
+    private void purchaseGeneralProduct(List<ReceiptItem> receiptItems, Stock stock, int quantity) {
+        if (quantity > stock.getQuantity()) {
+            throw new IllegalArgumentException(INVALIDATE_AVAILABLE_STOCK_MESSAGE);
+        }
+        receiptItems.add(new ReceiptItem(stock.getName(), quantity, stock.getPrice()));
+        stock.decreaseQuantity(quantity);
+    }
+
+    private int applyPromotionStock(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGift, Stock promotionStock,
                                    int quantity) {
-        int remainQuantity = quantity;
         PromotionResult promotionResult = promotionService.applyPromotion(promotions, promotionStock.getPromotion(),
                 promotionStock.getQuantity(), quantity);
         if (promotionResult.getMessage().equals("만료")) {
-            return remainQuantity;
+            return quantity;
         }
         int actualNumberOfPurchases = applyPromotionResult(promotionResult, receiptItems, freeGift, promotionStock,
                 quantity);
+        return deductPromotionStock(actualNumberOfPurchases, promotionStock, quantity);
+    }
+
+    private int deductPromotionStock(int actualNumberOfPurchases, Stock promotionStock, int remainQuantity) {
         if (actualNumberOfPurchases > promotionStock.getQuantity()) {
             remainQuantity = actualNumberOfPurchases - promotionStock.getQuantity();
             promotionStock.decreaseQuantity(promotionStock.getQuantity());
@@ -139,15 +157,7 @@ public class PaymentSystemController {
         return remainQuantity;
     }
 
-    public void purchaseGeneralProduct(List<ReceiptItem> receiptItems, Stock stock, int quantity) {
-        if (quantity > stock.getQuantity()) {
-            throw new IllegalArgumentException(INVALIDATE_AVAILABLE_STOCK_MESSAGE);
-        }
-        receiptItems.add(new ReceiptItem(stock.getName(), quantity, stock.getPrice()));
-        stock.decreaseQuantity(quantity);
-    }
-
-    public int applyPromotionResult(PromotionResult promotionResult, List<ReceiptItem> receiptItems,
+    private int applyPromotionResult(PromotionResult promotionResult, List<ReceiptItem> receiptItems,
                                     List<ReceiptItem> freeGift, Stock stock, int quantity) {
         if (promotionResult.getMessage().equals("추가")) {
             return addPromotionProduct(promotionResult, receiptItems, freeGift, stock);
@@ -192,34 +202,21 @@ public class PaymentSystemController {
     private void addFreeGift(List<ReceiptItem> freeGift, Stock stock, int quantity) {
         if (stock.getPromotion().matches(".*2\\+1.*")) { // 시간 되면 수정
             if (quantity > stock.getQuantity()) {
-                int freeQuantity = stock.getQuantity() / 3;
-                if (freeQuantity > 0) {
-                    freeGift.add(new ReceiptItem(stock.getName(), freeQuantity, stock.getPrice()));
-                    return;
-                }
+                addFreeGiftCommonPart(freeGift, stock, stock.getQuantity(), 3);
             }
-            int freeQuantity = quantity / 3;
-            if (freeQuantity > 0) {
-                freeGift.add(new ReceiptItem(stock.getName(), freeQuantity, stock.getPrice()));
-                return;
-            }
+            addFreeGiftCommonPart(freeGift, stock, quantity, 3);
         }
         if (quantity > stock.getQuantity()) {
-            int freeQuantity = stock.getQuantity() / 2;
-            if (freeQuantity > 0) {
-                freeGift.add(new ReceiptItem(stock.getName(), freeQuantity, stock.getPrice()));
-                return;
-            }
+            addFreeGiftCommonPart(freeGift, stock, stock.getQuantity(), 2);
         }
-        int freeQuantity = quantity / 2;
+        addFreeGiftCommonPart(freeGift, stock, quantity, 2);
+    }
+
+    private void addFreeGiftCommonPart(List<ReceiptItem> freeGift, Stock stock, int quantity, int dividingNumber) {
+        int freeQuantity = quantity / dividingNumber;
         if (freeQuantity > 0) {
             freeGift.add(new ReceiptItem(stock.getName(), freeQuantity, stock.getPrice()));
         }
-    }
-
-    private String askMembership(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGift) {
-        output.printInstructionsAboutMembership();
-        return inputYesOrNo();
     }
 
     private int calculateMembershipAmount(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGift,
