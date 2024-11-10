@@ -37,9 +37,9 @@ public class PromotionService {
         if (findPromotionStatus(promotion.getStart_date(), promotion.getEnd_date())) {
 
             if (promotion.getBuy() == 2 && promotion.getGet() == 1) {
-                return calculateAvailableQuantityTwoPlusOne(stockQuantity, quantity);
+                return calculateAvailableQuantity(stockQuantity, quantity,3);
             }
-            return calculateAvailableQuantityOnePlusOne(stockQuantity, quantity);
+            return calculateAvailableQuantity(stockQuantity, quantity,2);
         }
         return new PromotionResult(PromotionStatus.EXPIRED, 0, 0);
     }
@@ -51,28 +51,19 @@ public class PromotionService {
                 LocalDate.parse(end_date).atTime(LocalTime.MAX));
     }
 
-    private PromotionResult calculateAvailableQuantityTwoPlusOne(int stockQuantity, int quantity) {
-        int remainder = quantity % 3;
+    private PromotionResult calculateAvailableQuantity(int stockQuantity, int quantity, int dividingNumber) {
+        int remainder = quantity % dividingNumber;
         if (stockQuantity >= quantity) {
-            return checkRemainderTwoPlusOne(stockQuantity, quantity, remainder);
-        }
-        int applyQuantity = (stockQuantity / 3) * 3;
-        return new PromotionResult(PromotionStatus.GIVE_UP, quantity, quantity - applyQuantity);
-    }
-
-    private PromotionResult calculateAvailableQuantityOnePlusOne(int stockQuantity, int quantity) {
-        int remainder = quantity % 2;
-        if (stockQuantity >= quantity) {
-            if (remainder == 0) {
-                return new PromotionResult(PromotionStatus.NONE, quantity, 0);
+            if(dividingNumber == 3){
+                return calculateAvailableQuantityTwoPlusOne(stockQuantity, quantity, remainder);
             }
-            return checkAdditionalAvailabilityOne(stockQuantity, quantity, false);
+            return calculateAvailableQuantityOnePlusOne(stockQuantity, quantity, remainder);
         }
-        int applyQuantity = (stockQuantity / 2) * 2;
+        int applyQuantity = (stockQuantity / dividingNumber) * dividingNumber;
         return new PromotionResult(PromotionStatus.GIVE_UP, quantity, quantity - applyQuantity);
     }
 
-    private PromotionResult checkRemainderTwoPlusOne(int stockQuantity, int quantity, int remainder) {
+    private PromotionResult calculateAvailableQuantityTwoPlusOne(int stockQuantity, int quantity, int remainder) {
         if (remainder == 0) {
             return new PromotionResult(PromotionStatus.NONE, quantity, 0);
         }
@@ -80,6 +71,13 @@ public class PromotionService {
             return checkAdditionalAvailabilityTwo(stockQuantity, quantity);
         }
         return checkAdditionalAvailabilityOne(stockQuantity, quantity, true);
+    }
+
+    private PromotionResult calculateAvailableQuantityOnePlusOne(int stockQuantity, int quantity, int remainder) {
+        if (remainder == 0) {
+            return new PromotionResult(PromotionStatus.NONE, quantity, 0);
+        }
+        return checkAdditionalAvailabilityOne(stockQuantity, quantity, false);
     }
 
     private PromotionResult checkAdditionalAvailabilityTwo(int stockQuantity, int quantity) {
