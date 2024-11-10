@@ -90,7 +90,7 @@ public class PaymentSystemController {
     private void orderProcess(Map<String, Integer> orders) {
         List<ReceiptItem> receiptItems = new ArrayList<>();
         List<ReceiptItem> freeGift = new ArrayList<>();
-
+        checkInventoryQuantity(orders);
         for (String stockName : orders.keySet()) {
             int quantity = orders.get(stockName);
             List<Stock> sameNameStock = stockService.findStockByName(stocks, stockName, quantity);
@@ -98,6 +98,13 @@ public class PaymentSystemController {
         }
         String membershipStatus = askMembership();
         printReceipt(receiptItems, freeGift, membershipStatus);
+    }
+
+    private void checkInventoryQuantity(Map<String, Integer> orders){
+        for (String stockName : orders.keySet()) {
+            int quantity = orders.get(stockName);
+            stockService.findStockByName(stocks, stockName, quantity);
+        }
     }
 
     private String askMembership() {
