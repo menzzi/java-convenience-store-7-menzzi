@@ -45,9 +45,9 @@ public class OutputView {
         DecimalFormat df = new DecimalFormat("###,###");
 
         System.out.println(FIRST_LINE_OF_RECEIPT);
-        System.out.printf("%-12s\t%-5s\t%-10s\n", "상품명", "수량", "금액");
+        System.out.printf("%-15s\t%-6s\t%-5s\n", "상품명", "수량", "금액");
         for (ReceiptItem item : receiptItems) {
-            System.out.printf("%-12s\t%-5d\t%-10s\n", item.getItemName(), item.getItemQuantity(),
+            System.out.printf("%-15s\t%-7d\t%-10s\n", item.getItemName(), item.getItemQuantity(),
                     df.format(item.getTotalPrice()));
         }
     }
@@ -55,7 +55,7 @@ public class OutputView {
     public void printPromotionInfomation(List<ReceiptItem> freeGift) {
         System.out.println(SECOND_LINE_OF_RECEIPT);
         for (ReceiptItem item : freeGift) {
-            System.out.printf("%-12s\t%-5d\n", item.getItemName(), item.getItemQuantity());
+            System.out.printf("%-15s\t%-7d\n", item.getItemName(), item.getItemQuantity());
         }
     }
 
@@ -64,10 +64,10 @@ public class OutputView {
         DecimalFormat df = new DecimalFormat("###,###");
 
         System.out.println(THIRD_LINE_OF_RECEIPT);
-        System.out.printf("%-12s\t%-5d\t%-10s\n", TOTAL_PURCHASE_AMOUNT, totalCount, df.format(totalAmount));
-        System.out.printf("%-20s\t%-10s\n", PROMOTION_DISCOUNT, "-" + df.format(totalPromotionAmount));
-        System.out.printf("%-20s\t%-10s\n", MEMBERSHIP_DISCOUNT, "-" + df.format(membershipAmount));
-        System.out.printf("%-20s\t%-10s\n", MONEY_TO_BE_PAY, df.format(totalMoneyToBePaid));
+        System.out.printf("%-15s\t%-7d\t%-10s\n", TOTAL_PURCHASE_AMOUNT, totalCount, df.format(totalAmount));
+        System.out.printf("%-25s\t%-10s\n", PROMOTION_DISCOUNT, "-" + df.format(totalPromotionAmount));
+        System.out.printf("%-25s\t%-10s\n", MEMBERSHIP_DISCOUNT, "-" + df.format(membershipAmount));
+        System.out.printf("%-20s\t%10s\n", MONEY_TO_BE_PAY, df.format(totalMoneyToBePaid));
         System.out.println();
     }
 }

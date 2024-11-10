@@ -4,9 +4,9 @@ public class OutputMessage {
     public static final String WELCOME_GREETING = "안녕하세요. W편의점입니다.";
     public static final String STOCK_INFORMATION = "현재 보유하고 있는 상품입니다.";
 
-    public static final String FIRST_LINE_OF_RECEIPT = "===========W 편의점=============";
-    public static final String SECOND_LINE_OF_RECEIPT = "===========증\t정=============";
-    public static final String THIRD_LINE_OF_RECEIPT = "==============================";
+    public static final String FIRST_LINE_OF_RECEIPT = "==============W 편의점================";
+    public static final String SECOND_LINE_OF_RECEIPT = "=============증     정===============";
+    public static final String THIRD_LINE_OF_RECEIPT = "====================================";
     public static final String TOTAL_PURCHASE_AMOUNT = "총구매액";
     public static final String PROMOTION_DISCOUNT = "행사할인";
     public static final String MEMBERSHIP_DISCOUNT = "멤버십할인";
