@@ -22,6 +22,18 @@ public class PromotionService {
         return promotionRepository.getAllPromotions();
     }
 
+    public PromotionResult applyPromotion(List<Promotion> promotions, String promotionName, int stockQuantity,
+                                          int quantity) {
+        Promotion promotion = findPromotionByName(promotions, promotionName);
+        if (findPromotionStatus(promotion.getStart_date(), promotion.getEnd_date())) {
+            if (promotion.getBuy() == 2 && promotion.getGet() == 1) {
+                return calculateAvailableQuantity(stockQuantity, quantity, 3);
+            }
+            return calculateAvailableQuantity(stockQuantity, quantity, 2);
+        }
+        return new PromotionResult(PromotionStatus.EXPIRED, 0, 0);
+    }
+
     public Promotion findPromotionByName(List<Promotion> promotions, String promotionName) {
         for (Promotion promotion : promotions) {
             if (promotion.getName().equals(promotionName)) {
@@ -29,19 +41,6 @@ public class PromotionService {
             }
         }
         return null;
-    }
-
-    public PromotionResult applyPromotion(List<Promotion> promotions, String promotionName, int stockQuantity,
-                                          int quantity) {
-        Promotion promotion = findPromotionByName(promotions, promotionName);
-        if (findPromotionStatus(promotion.getStart_date(), promotion.getEnd_date())) {
-
-            if (promotion.getBuy() == 2 && promotion.getGet() == 1) {
-                return calculateAvailableQuantity(stockQuantity, quantity,3);
-            }
-            return calculateAvailableQuantity(stockQuantity, quantity,2);
-        }
-        return new PromotionResult(PromotionStatus.EXPIRED, 0, 0);
     }
 
     private boolean findPromotionStatus(String start_date, String end_date) {
@@ -54,7 +53,7 @@ public class PromotionService {
     private PromotionResult calculateAvailableQuantity(int stockQuantity, int quantity, int dividingNumber) {
         int remainder = quantity % dividingNumber;
         if (stockQuantity >= quantity) {
-            if(dividingNumber == 3){
+            if (dividingNumber == 3) {
                 return calculateAvailableQuantityTwoPlusOne(stockQuantity, quantity, remainder);
             }
             return calculateAvailableQuantityOnePlusOne(stockQuantity, quantity, remainder);
