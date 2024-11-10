@@ -7,6 +7,7 @@ import java.time.LocalTime;
 import java.util.List;
 import store.model.domain.Promotion;
 import store.model.domain.PromotionResult;
+import store.model.domain.PromotionStatus;
 import store.model.repository.PromotionRepository;
 
 public class PromotionService {
@@ -40,7 +41,7 @@ public class PromotionService {
             }
             return calculateAvailableQuantityOnePlusOne(stockQuantity, quantity);
         }
-        return new PromotionResult("만료", 0, 0);
+        return new PromotionResult(PromotionStatus.EXPIRED, 0, 0);
     }
 
     private boolean findPromotionStatus(String start_date, String end_date) {
@@ -56,24 +57,24 @@ public class PromotionService {
             return checkRemainderTwoPlusOne(stockQuantity, quantity, remainder);
         }
         int applyQuantity = (stockQuantity / 3) * 3;
-        return new PromotionResult("포기", quantity, quantity - applyQuantity);
+        return new PromotionResult(PromotionStatus.GIVE_UP, quantity, quantity - applyQuantity);
     }
 
     private PromotionResult calculateAvailableQuantityOnePlusOne(int stockQuantity, int quantity) {
         int remainder = quantity % 2;
         if (stockQuantity >= quantity) {
             if (remainder == 0) {
-                return new PromotionResult("", quantity, 0);
+                return new PromotionResult(PromotionStatus.NONE, quantity, 0);
             }
             return checkAdditionalAvailabilityOne(stockQuantity, quantity, false);
         }
         int applyQuantity = (stockQuantity / 2) * 2;
-        return new PromotionResult("포기", quantity, quantity - applyQuantity);
+        return new PromotionResult(PromotionStatus.GIVE_UP, quantity, quantity - applyQuantity);
     }
 
     private PromotionResult checkRemainderTwoPlusOne(int stockQuantity, int quantity, int remainder) {
         if (remainder == 0) {
-            return new PromotionResult("", quantity, 0);
+            return new PromotionResult(PromotionStatus.NONE, quantity, 0);
         }
         if (remainder == 1) {
             return checkAdditionalAvailabilityTwo(stockQuantity, quantity);
@@ -83,18 +84,18 @@ public class PromotionService {
 
     private PromotionResult checkAdditionalAvailabilityTwo(int stockQuantity, int quantity) {
         if (stockQuantity >= quantity + 2) {
-            return new PromotionResult("추가", quantity, 2);
+            return new PromotionResult(PromotionStatus.ADDITIONAL, quantity, 2);
         }
-        return new PromotionResult("포기", quantity, 1);
+        return new PromotionResult(PromotionStatus.GIVE_UP, quantity, 1);
     }
 
     private PromotionResult checkAdditionalAvailabilityOne(int stockQuantity, int quantity, boolean isTwoPlusOne) {
         if (stockQuantity >= quantity + 1) {
-            return new PromotionResult("추가", quantity, 1);
+            return new PromotionResult(PromotionStatus.ADDITIONAL, quantity, 1);
         }
         if (isTwoPlusOne) {
-            return new PromotionResult("포기", quantity, 2);
+            return new PromotionResult(PromotionStatus.GIVE_UP, quantity, 2);
         }
-        return new PromotionResult("포기", quantity, 1);
+        return new PromotionResult(PromotionStatus.GIVE_UP, quantity, 1);
     }
 }

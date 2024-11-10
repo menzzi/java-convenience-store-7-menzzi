@@ -41,7 +41,7 @@ public class PromotionServiceTest {
 
         PromotionResult result = promotionService.applyPromotion(promotions, "2+1", 6, 4);
 
-        assertEquals("추가", result.getMessage());
+        assertEquals("추가", result.getStatus().getStatusMessage());
         assertEquals(4,result.getCurrentQuantity());
         assertEquals(2,result.getRelateQuantity());
     }
@@ -55,7 +55,7 @@ public class PromotionServiceTest {
 
         PromotionResult result = promotionService.applyPromotion(promotions, "2+1", 5, 4);
 
-        assertEquals("포기", result.getMessage());
+        assertEquals("포기", result.getStatus().getStatusMessage());
         assertEquals(4,result.getCurrentQuantity());
         assertEquals(1,result.getRelateQuantity());
     }
@@ -69,7 +69,7 @@ public class PromotionServiceTest {
 
         PromotionResult result = promotionService.applyPromotion(promotions, "2+1", 7, 10);
 
-        assertEquals("포기", result.getMessage());
+        assertEquals("포기", result.getStatus().getStatusMessage());
         assertEquals(10,result.getCurrentQuantity());
         assertEquals(4,result.getRelateQuantity());
     }
@@ -83,7 +83,7 @@ public class PromotionServiceTest {
 
         PromotionResult result = promotionService.applyPromotion(promotions, "반짝할인", 5, 3);
 
-        assertEquals("추가", result.getMessage());
+        assertEquals("추가", result.getStatus().getStatusMessage());
         assertEquals(3,result.getCurrentQuantity());
         assertEquals(1,result.getRelateQuantity());
     }

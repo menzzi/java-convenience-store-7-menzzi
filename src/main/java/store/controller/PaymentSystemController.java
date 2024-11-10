@@ -6,6 +6,7 @@ import java.util.Map;
 import store.model.domain.MembershipDiscount;
 import store.model.domain.Promotion;
 import store.model.domain.PromotionResult;
+import store.model.domain.PromotionStatus;
 import store.model.domain.Receipt;
 import store.model.domain.ReceiptItem;
 import store.model.domain.Stock;
@@ -138,7 +139,7 @@ public class PaymentSystemController {
                                    int quantity) {
         PromotionResult promotionResult = promotionService.applyPromotion(promotions, promotionStock.getPromotion(),
                 promotionStock.getQuantity(), quantity);
-        if (promotionResult.getMessage().equals("만료")) {
+        if (promotionResult.getStatus() == PromotionStatus.EXPIRED) {
             return quantity;
         }
         int actualNumberOfPurchases = applyPromotionResult(promotionResult, receiptItems, freeGift, promotionStock,
@@ -159,10 +160,10 @@ public class PaymentSystemController {
 
     private int applyPromotionResult(PromotionResult promotionResult, List<ReceiptItem> receiptItems,
                                     List<ReceiptItem> freeGift, Stock stock, int quantity) {
-        if (promotionResult.getMessage().equals("추가")) {
+        if (promotionResult.getStatus() == PromotionStatus.ADDITIONAL) {
             return addPromotionProduct(promotionResult, receiptItems, freeGift, stock);
         }
-        if (promotionResult.getMessage().equals("포기")) {
+        if (promotionResult.getStatus()== PromotionStatus.GIVE_UP) {
             return givingUpPromotionProduct(promotionResult, receiptItems, freeGift, stock);
         }
         return purchaseByApplyingPromotion(receiptItems, freeGift, stock, promotionResult.getCurrentQuantity());

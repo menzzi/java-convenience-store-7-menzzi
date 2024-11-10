@@ -1,18 +1,18 @@
 package store.model.domain;
 
 public class PromotionResult {
-    private final String message;
+    private final PromotionStatus status;
     private final int currentQuantity;
     private final int relateQuantity;
 
-    public PromotionResult(String message, int applicableQuantity, int bonusQuantity) {
-        this.message = message;
+    public PromotionResult(PromotionStatus status, int applicableQuantity, int bonusQuantity) {
+        this.status = status;
         this.currentQuantity = applicableQuantity;
         this.relateQuantity = bonusQuantity;
     }
 
-    public String getMessage() {
-        return message;
+    public PromotionStatus getStatus() {
+        return status;
     }
 
     public int getCurrentQuantity() {
