@@ -21,13 +21,6 @@ public class PromotionService {
         return promotionRepository.getAllPromotions();
     }
 
-    public boolean findPromotionStatus(String start_date, String end_date) {
-        LocalDateTime now_date = DateTimes.now();
-
-        return now_date.isAfter(LocalDate.parse(start_date).atStartOfDay()) && now_date.isBefore(
-                LocalDate.parse(end_date).atTime(LocalTime.MAX));
-    }
-
     public Promotion findPromotionByName(List<Promotion> promotions, String promotionName) {
         for (Promotion promotion : promotions) {
             if (promotion.getName().equals(promotionName)) {
@@ -49,8 +42,15 @@ public class PromotionService {
         }
         return new PromotionResult("만료", 0, 0);
     }
+    
+    private boolean findPromotionStatus(String start_date, String end_date) {
+        LocalDateTime now_date = DateTimes.now();
 
-    public PromotionResult calculateAvailableQuantityTwoPlusOne(int stockQuantity, int quantity) {
+        return now_date.isAfter(LocalDate.parse(start_date).atStartOfDay()) && now_date.isBefore(
+                LocalDate.parse(end_date).atTime(LocalTime.MAX));
+    }
+
+    private PromotionResult calculateAvailableQuantityTwoPlusOne(int stockQuantity, int quantity) {
         int remainder = quantity % 3;
         if (stockQuantity >= quantity) {
             return checkRemainderTwoPlusOne(stockQuantity, quantity, remainder);
@@ -59,7 +59,7 @@ public class PromotionService {
         return new PromotionResult("포기", quantity, quantity - applyQuantity);
     }
 
-    public PromotionResult calculateAvailableQuantityOnePlusOne(int stockQuantity, int quantity) {
+    private PromotionResult calculateAvailableQuantityOnePlusOne(int stockQuantity, int quantity) {
         int remainder = quantity % 2;
         if (stockQuantity >= quantity) {
             if (remainder == 0) {
@@ -71,7 +71,7 @@ public class PromotionService {
         return new PromotionResult("포기", quantity, quantity - applyQuantity);
     }
 
-    public PromotionResult checkRemainderTwoPlusOne(int stockQuantity, int quantity, int remainder) {
+    private PromotionResult checkRemainderTwoPlusOne(int stockQuantity, int quantity, int remainder) {
         if (remainder == 0) {
             return new PromotionResult("", quantity, 0);
         }
@@ -81,14 +81,14 @@ public class PromotionService {
         return checkAdditionalAvailabilityOne(stockQuantity, quantity, true);
     }
 
-    public PromotionResult checkAdditionalAvailabilityTwo(int stockQuantity, int quantity) {
+    private PromotionResult checkAdditionalAvailabilityTwo(int stockQuantity, int quantity) {
         if (stockQuantity >= quantity + 2) {
             return new PromotionResult("추가", quantity, 2);
         }
         return new PromotionResult("포기", quantity, 1);
     }
 
-    public PromotionResult checkAdditionalAvailabilityOne(int stockQuantity, int quantity, boolean isTwoPlusOne) {
+    private PromotionResult checkAdditionalAvailabilityOne(int stockQuantity, int quantity, boolean isTwoPlusOne) {
         if (stockQuantity >= quantity + 1) {
             return new PromotionResult("추가", quantity, 1);
         }
