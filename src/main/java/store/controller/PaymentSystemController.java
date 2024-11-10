@@ -241,12 +241,12 @@ public class PaymentSystemController {
     private void calculate(Receipt receipt) {
         int totalPromotionAmount = 0;
 
-        if (!receipt.getFreeGifts().isEmpty()) {
-            output.printPromotionInfomation(receipt.getFreeGifts());
+        if (!receipt.freeGifts().isEmpty()) {
+            output.printPromotionInfomation(receipt.freeGifts());
             totalPromotionAmount = receipt.getTotalPromotionAmount();
         }
         int totalAmount = receipt.getTotalAmount();
-        int membershipAmount = calculateMembershipAmount(receipt.getReceiptItems(), receipt.getFreeGifts(), receipt.getMembershipDiscount());
+        int membershipAmount = calculateMembershipAmount(receipt.receiptItems(), receipt.freeGifts(), receipt.membershipDiscount());
         int totalMoneyToBePaid = totalAmount - totalPromotionAmount - membershipAmount;
         output.printMoneyInformation(totalAmount, receipt.getTotalQuantity(), totalPromotionAmount, membershipAmount,
                 totalMoneyToBePaid);
