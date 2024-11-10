@@ -26,7 +26,7 @@
     - [x]  고객이 구매할 때 정확한 재고 정보를 제공
     - [x]  구현에 필요한 상품 목록과 행사 목록을 파일 입출력을 통해 불러온다.  
     → `src/main/resources/products.md`파일
-- [ ]  할인 -> 프로모션 상품 구매 시 (재고 업데이트 오류)
+- [x]  할인
     - [x]  프로모션 할인
         - [x]  오늘 날짜가 프로모션 기간 내에 포함된 경우에만 할인을 적용
         - [x]  프로모션은 N개 구매 시 1개 무료 증정(Buy N Get 1 Free)의 형태로 진행
@@ -55,20 +55,23 @@
 ## 예외상황
 
 → `IllegalArgumentException`를 발생시키고, "[ERROR]"로 시작하는 에러 메시지를 출력 후 그 부분부터 입력을 다시 받는다.
-- [ ] [ERROR] + e.getMessage() 잊지말기 controller에서 [ERROR] 꼭 더해주기
+- [x] [ERROR] + e.getMessage() 잊지말기 controller에서 [ERROR] 꼭 더해주기
 - [x]  구매할 상품과 수량 형식이 올바르지 않은 경우: `[ERROR] 올바르지 않은 형식으로 입력했습니다. 다시 입력해 주세요.`
 - [x]  존재하지 않는 상품을 입력한 경우: `[ERROR] 존재하지 않는 상품입니다. 다시 입력해 주세요.`
 - [x]  구매 수량이 재고 수량을 초과한 경우: `[ERROR] 재고 수량을 초과하여 구매할 수 없습니다. 다시 입력해 주세요.`
-- [ ]  기타 잘못된 입력의 경우: `[ERROR] 잘못된 입력입니다. 다시 입력해 주세요.`  
+- [x]  기타 잘못된 입력의 경우: `[ERROR] 잘못된 입력입니다. 다시 입력해 주세요.`  
    - [x] Y/N 말고 다른 문자,숫자를 입력한 경우 (소문자 포함)
 
 ### 프로그래밍 요구사항
 (내가 실수할 수 있는 부분들만 가져옴)
 - [ ]  indent(인덴트, 들여쓰기) depth를 3이 넘지 않도록 구현. 2까지만 허용
 - [ ]  함수(또는 메서드)가 한 가지 일만 하도록 최대한 작게
-- [ ]  Java Enum을 적용하여 프로그램을 구현
-- [ ]  함수(또는 메서드)의 길이가 10라인을 넘어가지 않도록 구현
+- [x]  Java Enum을 적용하여 프로그램을 구현
+- [x]  함수(또는 메서드)의 길이가 10라인을 넘어가지 않도록 구현
 
+
+### 손봐야하는 부분
+- [ ] 입력한 순서대로 영수증 출력
 ---
 ### [ 1,2,3 주차 반성 ]
 
@@ -107,3 +110,29 @@
 
 ---
 ## 전체 구조
+```
+store
+├── Application.java
+├── controller
+│   └── PaymentSystemController.java
+├── model
+│   ├── domain
+│   │   ├── MembershipDiscount.java
+│   │   ├── Promotion.java
+│   │   ├── PromotionResult.java
+│   │   ├── Receipt.java
+│   │   ├── ReceiptItem.java
+│   │   └── Stock.java
+│   └── repository
+│       ├── PromotionRepository.java
+│       └── StockRepository.java
+├── service
+│   ├── PromotionService.java
+│   └── StockService.java
+├── util
+│   └── StringParser.java
+└── view
+├── InputView.java
+├── OutputMessage.java
+└── OutputView.java
+```
