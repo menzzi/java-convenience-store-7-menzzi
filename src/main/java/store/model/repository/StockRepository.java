@@ -45,12 +45,12 @@ public class StockRepository {
         addGeneralProduct(name, price, quantity, promotion);
     }
 
-    public void addPromotionProduct(String name, int price, int quantity, String promotion) {
+    private void addPromotionProduct(String name, int price, int quantity, String promotion) {
         stocks.add(new Stock(name, price, quantity, promotion));
         stocks.add(new Stock(name, price, 0, "null"));
     }
 
-    public void addGeneralProduct(String name, int price, int quantity, String promotion) {
+    private void addGeneralProduct(String name, int price, int quantity, String promotion) {
         Stock candidateSameName = stocks.getLast();
         if (candidateSameName.getName().equals(name) && candidateSameName.getPromotion().equals("null")) {
             stocks.remove(candidateSameName);

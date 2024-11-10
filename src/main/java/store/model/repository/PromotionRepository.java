@@ -32,7 +32,7 @@ public class PromotionRepository {
         return false;
     }
 
-    public void addPromotions(String[] values) {
+    private void addPromotions(String[] values) {
         String name = values[0].trim();
         int buy = Integer.parseInt(values[1].trim());
         int get = Integer.parseInt(values[2].trim());

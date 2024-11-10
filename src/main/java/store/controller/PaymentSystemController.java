@@ -33,7 +33,7 @@ public class PaymentSystemController {
         this.output = output;
     }
 
-    public void clearStock() {
+    private void clearStock() {
         stocks.clear();
         promotions.clear();
     }
