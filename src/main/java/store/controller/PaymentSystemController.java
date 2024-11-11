@@ -90,7 +90,7 @@ public class PaymentSystemController {
     private void orderProcess(Map<String, Integer> orders) {
         List<ReceiptItem> receiptItems = new ArrayList<>();
         List<ReceiptItem> freeGift = new ArrayList<>();
-        checkInventoryQuantity(orders);
+        checkStockQuantity(orders);
         for (String stockName : orders.keySet()) {
             int quantity = orders.get(stockName);
             List<Stock> sameNameStock = stockService.findStockByName(stocks, stockName, quantity);
@@ -100,7 +100,7 @@ public class PaymentSystemController {
         printReceipt(receiptItems, freeGift, membershipStatus);
     }
 
-    private void checkInventoryQuantity(Map<String, Integer> orders){
+    private void checkStockQuantity(Map<String, Integer> orders) {
         for (String stockName : orders.keySet()) {
             int quantity = orders.get(stockName);
             stockService.findStockByName(stocks, stockName, quantity);
@@ -210,7 +210,8 @@ public class PaymentSystemController {
     }
 
     private void addFreeGift(List<ReceiptItem> freeGift, Stock stock, int quantity) {
-        if (stock.getPromotion().matches(".*2\\+1.*")) { // 시간 되면 수정
+        Promotion promotion = promotionService.findPromotionByName(promotions, stock.getPromotion());
+        if (promotion.getBuy() == 2 && promotion.getGet() == 1) {
             addFreeGiftCommonPart(freeGift, stock, quantity, 3);
             return;
         }
