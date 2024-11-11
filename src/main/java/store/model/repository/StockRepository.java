@@ -13,23 +13,19 @@ public class StockRepository {
     public void updateStockFromFile(String filePath) {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
-            boolean isHeader = true;
+            reader.readLine();
             while ((line = reader.readLine()) != null) {
-                isHeader = readFile(line, isHeader);
+                readFile(line);
             }
         } catch (IOException ignored) {
         }
     }
 
-    private boolean readFile(String line, boolean isHeader) {
-        if (isHeader) {
-            return false;
-        }
+    private void readFile(String line) {
         String[] values = line.split(",");
         if (values.length == 4) {
             addStocks(values);
         }
-        return false;
     }
 
     private void addStocks(String[] values) {

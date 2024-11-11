@@ -13,23 +13,19 @@ public class PromotionRepository {
     public void updatePromotionFromFile(String filePath) {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
-            boolean isHeader = true;
+            reader.readLine();
             while ((line = reader.readLine()) != null) {
-                isHeader = readFile(line, isHeader);
+                readFile(line);
             }
         } catch (IOException ignored) {
         }
     }
 
-    public boolean readFile(String line, boolean isHeader) {
-        if (isHeader) {
-            return false;
-        }
+    public void readFile(String line) {
         String[] values = line.split(",");
         if (values.length == 5) {
             addPromotions(values);
         }
-        return false;
     }
 
     private void addPromotions(String[] values) {
