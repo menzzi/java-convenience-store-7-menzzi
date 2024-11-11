@@ -3,7 +3,6 @@ package store.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import store.model.domain.MembershipDiscount;
 import store.model.domain.Promotion;
 import store.model.domain.PromotionResult;
 import store.model.domain.PromotionStatus;
