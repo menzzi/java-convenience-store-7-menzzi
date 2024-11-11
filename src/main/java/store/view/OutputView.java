@@ -19,12 +19,12 @@ public class OutputView {
     }
 
     public void printInstructionsAboutUnavailablePromotion(String productName, int quantity) {
-        System.out.printf("현재 %s %d개는 %s", productName, quantity, UNAVAILBLE_PROMOTION_INSTRUCTIONS_MESSAGE);
+        System.out.printf(UNAVAILBLE_PROMOTION_INSTRUCTIONS_MESSAGE, productName, quantity);
         System.out.println();
     }
 
     public void printInstructionsAboutAddProduct(String productName, int quantity) {
-        System.out.printf("현재 %s은(는) %d개를 %s", productName, quantity, ADD_PRODUCT_INSTRUCTIONS_MESSAGE);
+        System.out.printf(ADD_PRODUCT_INSTRUCTIONS_MESSAGE, productName, quantity);
         System.out.println();
     }
 
