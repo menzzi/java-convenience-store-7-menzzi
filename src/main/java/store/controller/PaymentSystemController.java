@@ -217,11 +217,7 @@ public class PaymentSystemController {
 
     private void addFreeGift(List<ReceiptItem> freeGift, Stock stock, int quantity) {
         Promotion promotion = promotionService.findPromotionByName(promotions, stock.getPromotion());
-        if (promotion.buy() == 2 && promotion.get() == 1) {
-            addFreeGiftCommonPart(freeGift, stock, quantity, 3);
-            return;
-        }
-        addFreeGiftCommonPart(freeGift, stock, quantity, 2);
+        addFreeGiftCommonPart(freeGift, stock, quantity, promotion.getDividingNumber());
     }
 
     private void addFreeGiftCommonPart(List<ReceiptItem> freeGift, Stock stock, int quantity, int dividingNumber) {
