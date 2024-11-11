@@ -58,7 +58,7 @@ public class StockRepository {
         stocks.add(new Stock(name, price, quantity, promotion));
     }
 
-    public static List<Stock> getAllStocks() {
+    public List<Stock> getAllStocks() {
         return stocks;
     }
 }
