@@ -22,10 +22,10 @@ public class PromotionRepositoryTest {
 
         List<Promotion> promotions = promotionRepository.getAllPromotions();
         assertEquals(3, promotions.size());
-        assertEquals("탄산2+1", promotions.getFirst().getName());
-        assertEquals(2, promotions.getFirst().getBuy());
-        assertEquals(1, promotions.getFirst().getGet());
-        assertEquals("2024-01-01", promotions.getFirst().getStart_date());
-        assertEquals("2024-12-31", promotions.getFirst().getEnd_date());
+        assertEquals("탄산2+1", promotions.getFirst().name());
+        assertEquals(2, promotions.getFirst().buy());
+        assertEquals(1, promotions.getFirst().get());
+        assertEquals("2024-01-01", promotions.getFirst().start_date());
+        assertEquals("2024-12-31", promotions.getFirst().end_date());
     }
 }

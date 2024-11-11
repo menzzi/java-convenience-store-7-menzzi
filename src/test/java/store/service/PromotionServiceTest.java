@@ -30,7 +30,7 @@ public class PromotionServiceTest {
         Promotion result = promotionService.findPromotionByName(promotions, "반짝할인");
 
         assertNotNull(result);
-        assertEquals("반짝할인", result.getName());
+        assertEquals("반짝할인", result.name());
     }
 
     @ParameterizedTest

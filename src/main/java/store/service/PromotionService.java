@@ -25,8 +25,8 @@ public class PromotionService {
     public PromotionResult applyPromotion(List<Promotion> promotions, String promotionName, int stockQuantity,
                                           int quantity) {
         Promotion promotion = findPromotionByName(promotions, promotionName);
-        if (findPromotionStatus(promotion.getStart_date(), promotion.getEnd_date())) {
-            if (promotion.getBuy() == 2 && promotion.getGet() == 1) {
+        if (findPromotionStatus(promotion.start_date(), promotion.end_date())) {
+            if (promotion.buy() == 2 && promotion.get() == 1) {
                 return calculateAvailableQuantity(stockQuantity, quantity, 3);
             }
             return calculateAvailableQuantity(stockQuantity, quantity, 2);
@@ -36,7 +36,7 @@ public class PromotionService {
 
     public Promotion findPromotionByName(List<Promotion> promotions, String promotionName) {
         for (Promotion promotion : promotions) {
-            if (promotion.getName().equals(promotionName)) {
+            if (promotion.name().equals(promotionName)) {
                 return promotion;
             }
         }
