@@ -14,6 +14,7 @@ import store.model.repository.PromotionRepository;
 import store.model.repository.StockRepository;
 import store.service.PromotionService;
 import store.service.StockService;
+import store.util.Calculator;
 import store.util.StringParser;
 import store.view.InputView;
 import store.view.OutputView;
@@ -239,29 +240,16 @@ public class PaymentSystemController {
 
     private void calculatePayment(Receipt receipt) {
         int totalPromotionAmount = 0;
-
         if (!receipt.freeGifts().isEmpty()) {
             output.printPromotionInfomation(receipt.freeGifts());
             totalPromotionAmount = receipt.getTotalPromotionAmount();
         }
         int totalAmount = receipt.getTotalAmount();
-        int membershipAmount = calculateMembershipAmount(receipt.receiptItems(), receipt.freeGifts(),
+        int membershipAmount = Calculator.calculateMembershipAmount(receipt.receiptItems(), receipt.freeGifts(),
                 receipt.membershipDiscount());
-        int totalMoneyToBePaid = totalAmount - totalPromotionAmount - membershipAmount;
+        int totalMoneyToBePaid = Calculator.calculateTotalMoneyToBePaid(totalAmount, totalPromotionAmount,
+                membershipAmount);
         output.printMoneyInformation(totalAmount, receipt.getTotalQuantity(), totalPromotionAmount, membershipAmount,
                 totalMoneyToBePaid);
-    }
-
-    private int calculateMembershipAmount(List<ReceiptItem> receiptItems, List<ReceiptItem> freeGift,
-                                          String membershipStatus) {
-        int total = 0;
-        for (ReceiptItem receiptItem : receiptItems) {
-            boolean isFreeGift = freeGift.stream()
-                    .anyMatch(gift -> gift.getItemName().equals(receiptItem.getItemName()));
-            if (!isFreeGift) {
-                total += receiptItem.getTotalPrice();
-            }
-        }
-        return MembershipDiscount.applyMembershipDiscount(membershipStatus, total);
     }
 }
