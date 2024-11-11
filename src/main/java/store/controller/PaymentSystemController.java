@@ -65,17 +65,23 @@ public class PaymentSystemController {
     }
 
     private void inputAndProceedOrder() {
-        try {
-            orderProcess(StringParser.validateOrderFormat(input.inputOrder()));
-        } catch (IllegalArgumentException e) {
-            output.printErrorMessage(e.getMessage());
-            inputAndProceedOrder();
+        boolean isOrderComplete = false;
+        while (!isOrderComplete) {
+            try {
+                orderProcess(StringParser.validateOrderFormat(input.inputOrder()));
+                isOrderComplete = true;
+            } catch (IllegalArgumentException e) {
+                output.printErrorMessage(e.getMessage());
+            }
         }
+        proceedAdditionalPurchase();
+    }
+
+    private void proceedAdditionalPurchase() {
         output.printInstructionsAboutAdditionalPurchase();
-        if (!inputYesOrNo().equals("Y")) {
-            return;
+        if (inputYesOrNo().equals("Y")) {
+            order();
         }
-        order();
     }
 
     private String inputYesOrNo() {
